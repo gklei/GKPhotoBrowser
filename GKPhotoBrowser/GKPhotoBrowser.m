@@ -65,7 +65,7 @@
 {
    self.dimLayer = [CALayer layer];
    self.dimLayer.frame = containerView.superview.bounds;
-   self.dimLayer.opacity = .95;
+   self.dimLayer.opacity = .9;
    
    [containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
 }
@@ -87,6 +87,8 @@
 #pragma mark - Private
 - (void)toggleResize:(UITapGestureRecognizer*)recognizer
 {
+   [self.containerView.superview bringSubviewToFront:self.containerView];
+   
    self.enlarged = !self.enlarged;
    self.dimLayer.backgroundColor = self.enlarged ? [UIColor blackColor].CGColor : [UIColor clearColor].CGColor;
    
