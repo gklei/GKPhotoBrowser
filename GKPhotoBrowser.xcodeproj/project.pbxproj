@@ -13,15 +13,17 @@
 		5B45BC9319AC158C0077852E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BC9119AC158C0077852E /* InfoPlist.strings */; };
 		5B45BC9519AC158C0077852E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BC9419AC158C0077852E /* main.m */; };
 		5B45BC9919AC158C0077852E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BC9819AC158C0077852E /* AppDelegate.m */; };
-		5B45BC9C19AC158C0077852E /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BC9A19AC158C0077852E /* Main_iPhone.storyboard */; };
-		5B45BC9F19AC158C0077852E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BC9D19AC158C0077852E /* Main_iPad.storyboard */; };
-		5B45BCA219AC158C0077852E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCA119AC158C0077852E /* ViewController.m */; };
+		5B45BCA219AC158C0077852E /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCA119AC158C0077852E /* MainViewController.m */; };
 		5B45BCA419AC158C0077852E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BCA319AC158C0077852E /* Images.xcassets */; };
 		5B45BCAB19AC158C0077852E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B45BCAA19AC158C0077852E /* XCTest.framework */; };
 		5B45BCAC19AC158C0077852E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B45BC8819AC158C0077852E /* Foundation.framework */; };
 		5B45BCAD19AC158C0077852E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B45BC8C19AC158C0077852E /* UIKit.framework */; };
 		5B45BCB519AC158C0077852E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BCB319AC158C0077852E /* InfoPlist.strings */; };
 		5B45BCB719AC158C0077852E /* GKPhotoBrowserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCB619AC158C0077852E /* GKPhotoBrowserTests.m */; };
+		5B45BCC119AC15CA0077852E /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BCC019AC15CA0077852E /* MainViewController.xib */; };
+		5B45BCC519AC16C10077852E /* GKPhotoBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCC319AC16C10077852E /* GKPhotoBrowser.m */; };
+		5B45BCC619AC16C10077852E /* GKPhotoBrowser.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */; };
+		5B45BCC919AC35CA0077852E /* GKPaddedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCC819AC35CA0077852E /* GKPaddedLabel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,16 +47,20 @@
 		5B45BC9619AC158C0077852E /* GKPhotoBrowser-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GKPhotoBrowser-Prefix.pch"; sourceTree = "<group>"; };
 		5B45BC9719AC158C0077852E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5B45BC9819AC158C0077852E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		5B45BC9B19AC158C0077852E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		5B45BC9E19AC158C0077852E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
-		5B45BCA019AC158C0077852E /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		5B45BCA119AC158C0077852E /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		5B45BCA019AC158C0077852E /* MainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		5B45BCA119AC158C0077852E /* MainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 		5B45BCA319AC158C0077852E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		5B45BCA919AC158C0077852E /* GKPhotoBrowserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GKPhotoBrowserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B45BCAA19AC158C0077852E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		5B45BCB219AC158C0077852E /* GKPhotoBrowserTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GKPhotoBrowserTests-Info.plist"; sourceTree = "<group>"; };
 		5B45BCB419AC158C0077852E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B45BCB619AC158C0077852E /* GKPhotoBrowserTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GKPhotoBrowserTests.m; sourceTree = "<group>"; };
+		5B45BCC019AC15CA0077852E /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainViewController.xib; sourceTree = "<group>"; };
+		5B45BCC219AC16C10077852E /* GKPhotoBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GKPhotoBrowser.h; sourceTree = "<group>"; };
+		5B45BCC319AC16C10077852E /* GKPhotoBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GKPhotoBrowser.m; sourceTree = "<group>"; };
+		5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GKPhotoBrowser.xib; sourceTree = "<group>"; };
+		5B45BCC719AC35CA0077852E /* GKPaddedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GKPaddedLabel.h; sourceTree = "<group>"; };
+		5B45BCC819AC35CA0077852E /* GKPaddedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GKPaddedLabel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,11 +122,15 @@
 			children = (
 				5B45BC9719AC158C0077852E /* AppDelegate.h */,
 				5B45BC9819AC158C0077852E /* AppDelegate.m */,
-				5B45BC9A19AC158C0077852E /* Main_iPhone.storyboard */,
-				5B45BC9D19AC158C0077852E /* Main_iPad.storyboard */,
-				5B45BCA019AC158C0077852E /* ViewController.h */,
-				5B45BCA119AC158C0077852E /* ViewController.m */,
+				5B45BCC219AC16C10077852E /* GKPhotoBrowser.h */,
+				5B45BCC319AC16C10077852E /* GKPhotoBrowser.m */,
+				5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */,
+				5B45BCC719AC35CA0077852E /* GKPaddedLabel.h */,
+				5B45BCC819AC35CA0077852E /* GKPaddedLabel.m */,
 				5B45BCA319AC158C0077852E /* Images.xcassets */,
+				5B45BCA019AC158C0077852E /* MainViewController.h */,
+				5B45BCA119AC158C0077852E /* MainViewController.m */,
+				5B45BCC019AC15CA0077852E /* MainViewController.xib */,
 				5B45BC8F19AC158C0077852E /* Supporting Files */,
 			);
 			path = GKPhotoBrowser;
@@ -231,10 +241,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B45BC9F19AC158C0077852E /* Main_iPad.storyboard in Resources */,
 				5B45BCA419AC158C0077852E /* Images.xcassets in Resources */,
-				5B45BC9C19AC158C0077852E /* Main_iPhone.storyboard in Resources */,
+				5B45BCC119AC15CA0077852E /* MainViewController.xib in Resources */,
 				5B45BC9319AC158C0077852E /* InfoPlist.strings in Resources */,
+				5B45BCC619AC16C10077852E /* GKPhotoBrowser.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,9 +263,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B45BCA219AC158C0077852E /* ViewController.m in Sources */,
+				5B45BCA219AC158C0077852E /* MainViewController.m in Sources */,
 				5B45BC9919AC158C0077852E /* AppDelegate.m in Sources */,
 				5B45BC9519AC158C0077852E /* main.m in Sources */,
+				5B45BCC519AC16C10077852E /* GKPhotoBrowser.m in Sources */,
+				5B45BCC919AC35CA0077852E /* GKPaddedLabel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,22 +296,6 @@
 				5B45BC9219AC158C0077852E /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		5B45BC9A19AC158C0077852E /* Main_iPhone.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5B45BC9B19AC158C0077852E /* Base */,
-			);
-			name = Main_iPhone.storyboard;
-			sourceTree = "<group>";
-		};
-		5B45BC9D19AC158C0077852E /* Main_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5B45BC9E19AC158C0077852E /* Base */,
-			);
-			name = Main_iPad.storyboard;
 			sourceTree = "<group>";
 		};
 		5B45BCB319AC158C0077852E /* InfoPlist.strings */ = {
