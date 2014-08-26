@@ -51,12 +51,21 @@
    [self setupTextView];
 }
 
+- (void)viewDidLayoutSubviews
+{
+   if (!self.dimLayer)
+   {
+      [self setupDimLayerWithContainerView:self.containerView];
+   }
+}
+
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
    [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14]];
    self.textView.backgroundColor = [UIColor clearColor];
    self.textView.textColor = [UIColor whiteColor];
+   self.textView.showsVerticalScrollIndicator = NO;
    
    [self.containerView.superview addSubview:self.textView];
 }
@@ -75,8 +84,6 @@
 {
    self.containerView = containerView;
    [self.containerView addSubview:self.view];
-   
-   [self setupDimLayerWithContainerView:self.containerView];
 
    UIView* view = self.view;
    NSDictionary* views = NSDictionaryOfVariableBindings(view);
@@ -95,22 +102,39 @@
    CGFloat scale = CGRectGetWidth(self.containerView.superview.frame) / CGRectGetWidth(self.containerView.frame);
    CGFloat statusBarHeight = CGRectGetHeight([UIApplication sharedApplication].statusBarFrame);
    CGFloat shiftHeight = (CGRectGetHeight(self.containerView.superview.frame) - CGRectGetHeight(self.containerView.frame)*scale) - statusBarHeight*2;
+   CGFloat containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * scale;
+   CGFloat textViewHeight = CGRectGetHeight(self.containerView.superview.frame) - containerViewTargetHeight - statusBarHeight;
+   
+   if (self.enlarged)
+   {
+      self.textView.frame = CGRectMake(0,
+                                       CGRectGetHeight(self.containerView.superview.frame),
+                                       CGRectGetWidth(self.containerView.superview.frame),
+                                       textViewHeight);
+   }
+   
    CGAffineTransform transform = self.enlarged ? CGAffineTransformMakeTranslation(0, -shiftHeight) : CGAffineTransformIdentity;
    
    [UIView animateWithDuration:.3 animations:^{
       
       self.containerView.transform = CGAffineTransformScale(transform, scale, scale);
-      [self.containerView layoutIfNeeded];
       
-   } completion:^(BOOL finished) {
-      
-         CGFloat textViewHeight = CGRectGetHeight(self.containerView.superview.frame) - CGRectGetHeight(self.containerView.frame) - statusBarHeight;
+      if (self.enlarged)
+      {
          self.textView.frame = CGRectMake(0,
                                           CGRectGetHeight(self.containerView.superview.frame) - textViewHeight,
                                           CGRectGetWidth(self.containerView.superview.frame),
                                           textViewHeight);
+      }
+      else
+      {
+         self.textView.frame = CGRectMake(0,
+                                          CGRectGetHeight(self.containerView.superview.frame),
+                                          CGRectGetWidth(self.textView.frame),
+                                          CGRectGetHeight(self.textView.frame));
+      }
       
-         self.textView.hidden = !self.enlarged;
+      [self.containerView layoutIfNeeded];
    }];
 }
 
