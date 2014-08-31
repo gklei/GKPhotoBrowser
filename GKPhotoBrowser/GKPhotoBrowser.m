@@ -67,17 +67,15 @@
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = NO;
    self.textView.editable = NO;
-   
+
    [self.containerView.superview addSubview:self.textView];
 }
 
 - (void)setupDimLayerWithContainerView:(UIView*)containerView
 {
    self.dimLayer = [CALayer layer];
-   self.dimLayer.frame = containerView.superview.bounds;
+   self.dimLayer.frame = [UIScreen mainScreen].bounds;
    self.dimLayer.opacity = .9;
-
-   [containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
 }
 
 #pragma mark - Public
@@ -97,9 +95,19 @@
 {
    [self.containerView.superview bringSubviewToFront:self.containerView];
    [self.containerView.superview layoutIfNeeded];
+   self.textView.layer.zPosition = 100;
 
    self.enlarged = !self.enlarged;
+
    self.dimLayer.backgroundColor = self.enlarged ? [UIColor blackColor].CGColor : [UIColor clearColor].CGColor;
+   if (self.enlarged)
+   {
+      [self.containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
+   }
+   else
+   {
+      [self.dimLayer removeFromSuperlayer];
+   }
 
    CGFloat containerViewSuperviewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
    CGFloat containerViewSuperviewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
@@ -124,7 +132,6 @@
 
    [UIView animateWithDuration:.25 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
       self.containerView.layer.transform = self.enlarged ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
-
       self.textView.hidden = !self.enlarged;
    } completion:nil];
 }
