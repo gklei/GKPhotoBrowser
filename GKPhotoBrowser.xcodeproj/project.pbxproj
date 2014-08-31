@@ -389,6 +389,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GKPhotoBrowser/GKPhotoBrowser-Prefix.pch";
 				INFOPLIST_FILE = "GKPhotoBrowser/GKPhotoBrowser-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -402,6 +403,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GKPhotoBrowser/GKPhotoBrowser-Prefix.pch";
 				INFOPLIST_FILE = "GKPhotoBrowser/GKPhotoBrowser-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -466,6 +468,7 @@
 				5B45BCBC19AC158C0077852E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5B45BCBD19AC158C0077852E /* Build configuration list for PBXNativeTarget "GKPhotoBrowserTests" */ = {
 			isa = XCConfigurationList;
@@ -474,6 +477,7 @@
 				5B45BCBF19AC158C0077852E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
