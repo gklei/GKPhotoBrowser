@@ -16,6 +16,8 @@
 @property (nonatomic) UITextView* textView;
 @property (nonatomic) CALayer* dimLayer;
 @property (nonatomic) BOOL zoomed;
+@property (nonatomic, readonly) CGPoint containerViewCenterInSuperview;
+@property (nonatomic) UIView* topMostSuperview;
 
 @end
 
@@ -38,6 +40,24 @@
    self.textView.text = text;
 }
 
+- (CGPoint)containerViewCenterInSuperview
+{
+   return [self.topMostSuperview convertPoint:self.containerView.center fromView:self.containerView.superview];
+}
+
+- (UIView*)topMostSuperview
+{
+   UIView* superview = self.view.superview;
+   while (true)
+   {
+      if (superview.superview == nil)
+      {
+         return superview;
+      }
+      superview = superview.superview;
+   }
+}
+
 #pragma mark - Lifecycle
 - (void)viewDidLoad
 {
@@ -52,6 +72,7 @@
    [self setupDimLayer];
 }
 
+#pragma mark - Setup
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
@@ -60,6 +81,7 @@
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = NO;
    self.textView.editable = NO;
+   self.textView.selectable = NO;
 
    [self.containerView.superview addSubview:self.textView];
 }
@@ -96,10 +118,16 @@
    if (self.zoomed)
    {
       [self.containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
+
+      CGRect dimLayerFrame = self.dimLayer.frame;
+      CGRect convertedFrame = [self.topMostSuperview.layer convertRect:dimLayerFrame fromLayer:self.containerView.superview.layer];
+
+      self.dimLayer.frame = CGRectMake(0, -CGRectGetMinY(convertedFrame), CGRectGetWidth(dimLayerFrame), CGRectGetHeight(dimLayerFrame));
    }
    else
    {
       [self.dimLayer removeFromSuperlayer];
+      self.dimLayer.frame = [UIScreen mainScreen].bounds;
    }
 
    CGFloat containerViewSuperviewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
@@ -110,11 +138,11 @@
 
    CGFloat containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * scale;
    CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
-   CGPoint superviewCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
+   CGPoint screenCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
 
    CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
-   CGFloat verticalShift = self.containerView.center.y - superviewCenter.y + verticalOffset - statusBarHeight;
-   CGFloat horizontalShift = self.containerView.center.x - superviewCenter.x;
+   CGFloat verticalShift = self.containerViewCenterInSuperview.y - screenCenter.y + verticalOffset - statusBarHeight;
+   CGFloat horizontalShift = self.containerViewCenterInSuperview.x - screenCenter.x;
 
    CATransform3D transform = self.zoomed ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
 
@@ -124,17 +152,27 @@
                                     textViewHeight);
 
    [UIView animateWithDuration:.25 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+
       self.containerView.layer.transform = self.zoomed ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
       self.textView.hidden = !self.zoomed;
+
    } completion:^(BOOL finished){
+
       if (self.zoomed)
       {
          [UIView animateWithDuration:.15 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+
+            CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.containerView.superview.frame toView:self.topMostSuperview];
             self.textView.frame = CGRectMake(0,
-                                             containerViewSuperviewHeight - textViewHeight,
+                                             containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview),
                                              containerViewSuperviewWidth,
                                              textViewHeight);
          } completion:nil];
+      }
+      else
+      {
+         [self.containerView.superview sendSubviewToBack:self.containerView];
+         [self.containerView.superview layoutIfNeeded];
       }
    }];
 }
