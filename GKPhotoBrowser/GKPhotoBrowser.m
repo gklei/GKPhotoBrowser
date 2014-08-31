@@ -15,7 +15,7 @@
 @property (nonatomic) UIView* containerView;
 @property (nonatomic) UITextView* textView;
 @property (nonatomic) CALayer* dimLayer;
-@property (nonatomic) BOOL enlarged;
+@property (nonatomic) BOOL zoomed;
 
 @end
 
@@ -49,14 +49,7 @@
    [self.view addGestureRecognizer:tapRecognizer];
    
    [self setupTextView];
-}
-
-- (void)viewDidLayoutSubviews
-{
-   if (!self.dimLayer)
-   {
-      [self setupDimLayerWithContainerView:self.containerView];
-   }
+   [self setupDimLayer];
 }
 
 - (void)setupTextView
@@ -71,7 +64,7 @@
    [self.containerView.superview addSubview:self.textView];
 }
 
-- (void)setupDimLayerWithContainerView:(UIView*)containerView
+- (void)setupDimLayer
 {
    self.dimLayer = [CALayer layer];
    self.dimLayer.frame = [UIScreen mainScreen].bounds;
@@ -93,14 +86,14 @@
 #pragma mark - Private
 - (void)toggleResize:(UITapGestureRecognizer*)recognizer
 {
+   self.zoomed = !self.zoomed;
+
    [self.containerView.superview bringSubviewToFront:self.containerView];
    [self.containerView.superview layoutIfNeeded];
    self.textView.layer.zPosition = 100;
 
-   self.enlarged = !self.enlarged;
-
-   self.dimLayer.backgroundColor = self.enlarged ? [UIColor blackColor].CGColor : [UIColor clearColor].CGColor;
-   if (self.enlarged)
+   self.dimLayer.backgroundColor = self.zoomed ? [UIColor blackColor].CGColor : [UIColor clearColor].CGColor;
+   if (self.zoomed)
    {
       [self.containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
    }
@@ -119,21 +112,31 @@
    CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
    CGPoint superviewCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
 
-   CGFloat horizontalShift = self.containerView.center.x - superviewCenter.x;
    CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
    CGFloat verticalShift = self.containerView.center.y - superviewCenter.y + verticalOffset - statusBarHeight;
+   CGFloat horizontalShift = self.containerView.center.x - superviewCenter.x;
 
-   CATransform3D transform = self.enlarged ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
+   CATransform3D transform = self.zoomed ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
 
    self.textView.frame = CGRectMake(0,
-                                    containerViewSuperviewHeight - textViewHeight,
+                                    containerViewSuperviewHeight,
                                     containerViewSuperviewWidth,
                                     textViewHeight);
 
    [UIView animateWithDuration:.25 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-      self.containerView.layer.transform = self.enlarged ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
-      self.textView.hidden = !self.enlarged;
-   } completion:nil];
+      self.containerView.layer.transform = self.zoomed ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
+      self.textView.hidden = !self.zoomed;
+   } completion:^(BOOL finished){
+      if (self.zoomed)
+      {
+         [UIView animateWithDuration:.15 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            self.textView.frame = CGRectMake(0,
+                                             containerViewSuperviewHeight - textViewHeight,
+                                             containerViewSuperviewWidth,
+                                             textViewHeight);
+         } completion:nil];
+      }
+   }];
 }
 
 - (void)repositionTextViewBeforeAnimationWithHeight:(CGFloat)textViewHeight
