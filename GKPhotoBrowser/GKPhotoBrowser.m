@@ -66,6 +66,7 @@
    self.textView.backgroundColor = [UIColor clearColor];
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = NO;
+   self.textView.editable = NO;
    
    [self.containerView.superview addSubview:self.textView];
 }
@@ -75,7 +76,7 @@
    self.dimLayer = [CALayer layer];
    self.dimLayer.frame = containerView.superview.bounds;
    self.dimLayer.opacity = .9;
-   
+
    [containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
 }
 
@@ -95,47 +96,44 @@
 - (void)toggleResize:(UITapGestureRecognizer*)recognizer
 {
    [self.containerView.superview bringSubviewToFront:self.containerView];
-   
+   [self.containerView.superview layoutIfNeeded];
+
    self.enlarged = !self.enlarged;
    self.dimLayer.backgroundColor = self.enlarged ? [UIColor blackColor].CGColor : [UIColor clearColor].CGColor;
-   
-   CGFloat scale = CGRectGetWidth(self.containerView.superview.frame) / CGRectGetWidth(self.containerView.frame);
+
+   CGFloat containerViewSuperviewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+   CGFloat containerViewSuperviewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
+
    CGFloat statusBarHeight = CGRectGetHeight([UIApplication sharedApplication].statusBarFrame);
-   CGFloat shiftHeight = (CGRectGetHeight(self.containerView.superview.frame) - CGRectGetHeight(self.containerView.frame)*scale) - statusBarHeight*2;
+   CGFloat scale = containerViewSuperviewWidth / CGRectGetWidth(self.containerView.frame);
+
    CGFloat containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * scale;
-   CGFloat textViewHeight = CGRectGetHeight(self.containerView.superview.frame) - containerViewTargetHeight - statusBarHeight;
-   
-   if (self.enlarged)
-   {
-      self.textView.frame = CGRectMake(0,
-                                       CGRectGetHeight(self.containerView.superview.frame),
-                                       CGRectGetWidth(self.containerView.superview.frame),
-                                       textViewHeight);
-   }
-   
-   CGAffineTransform transform = self.enlarged ? CGAffineTransformMakeTranslation(0, -shiftHeight) : CGAffineTransformIdentity;
-   
-   [UIView animateWithDuration:.3 animations:^{
-      
-      self.containerView.transform = CGAffineTransformScale(transform, scale, scale);
-      
-      if (self.enlarged)
-      {
-         self.textView.frame = CGRectMake(0,
-                                          CGRectGetHeight(self.containerView.superview.frame) - textViewHeight,
-                                          CGRectGetWidth(self.containerView.superview.frame),
-                                          textViewHeight);
-      }
-      else
-      {
-         self.textView.frame = CGRectMake(0,
-                                          CGRectGetHeight(self.containerView.superview.frame),
-                                          CGRectGetWidth(self.textView.frame),
-                                          CGRectGetHeight(self.textView.frame));
-      }
-      
-      [self.containerView layoutIfNeeded];
-   }];
+   CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
+   CGPoint superviewCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
+
+   CGFloat horizontalShift = self.containerView.center.x - superviewCenter.x;
+   CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
+   CGFloat verticalShift = self.containerView.center.y - superviewCenter.y + verticalOffset - statusBarHeight;
+
+   CATransform3D transform = self.enlarged ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
+
+   self.textView.frame = CGRectMake(0,
+                                    containerViewSuperviewHeight - textViewHeight,
+                                    containerViewSuperviewWidth,
+                                    textViewHeight);
+
+   [UIView animateWithDuration:.25 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+      self.containerView.layer.transform = self.enlarged ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
+
+      self.textView.hidden = !self.enlarged;
+   } completion:nil];
+}
+
+- (void)repositionTextViewBeforeAnimationWithHeight:(CGFloat)textViewHeight
+{
+   CGFloat containerViewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+   CGFloat containerViewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
+   self.textView.frame = CGRectMake(0, containerViewHeight, containerViewWidth, textViewHeight);
 }
 
 @end
