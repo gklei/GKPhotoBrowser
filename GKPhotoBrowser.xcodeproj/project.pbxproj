@@ -23,7 +23,6 @@
 		5B45BCC119AC15CA0077852E /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BCC019AC15CA0077852E /* MainViewController.xib */; };
 		5B45BCC519AC16C10077852E /* GKPhotoBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCC319AC16C10077852E /* GKPhotoBrowser.m */; };
 		5B45BCC619AC16C10077852E /* GKPhotoBrowser.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */; };
-		5B45BCC919AC35CA0077852E /* GKPaddedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCC819AC35CA0077852E /* GKPaddedLabel.m */; };
 		8EBAC02919B5874200AEB617 /* FlatPillButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EBAC02619B5874200AEB617 /* FlatPillButton.m */; };
 		8EBAC02A19B5874200AEB617 /* FlatPillButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EBAC02819B5874200AEB617 /* FlatPillButtonCell.m */; };
 /* End PBXBuildFile section */
@@ -61,8 +60,6 @@
 		5B45BCC219AC16C10077852E /* GKPhotoBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GKPhotoBrowser.h; sourceTree = "<group>"; };
 		5B45BCC319AC16C10077852E /* GKPhotoBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GKPhotoBrowser.m; sourceTree = "<group>"; };
 		5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GKPhotoBrowser.xib; sourceTree = "<group>"; };
-		5B45BCC719AC35CA0077852E /* GKPaddedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GKPaddedLabel.h; sourceTree = "<group>"; };
-		5B45BCC819AC35CA0077852E /* GKPaddedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GKPaddedLabel.m; sourceTree = "<group>"; };
 		8EBAC02519B5874200AEB617 /* FlatPillButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlatPillButton.h; sourceTree = "<group>"; };
 		8EBAC02619B5874200AEB617 /* FlatPillButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlatPillButton.m; sourceTree = "<group>"; };
 		8EBAC02719B5874200AEB617 /* FlatPillButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlatPillButtonCell.h; sourceTree = "<group>"; };
@@ -135,8 +132,6 @@
 				5B45BCC219AC16C10077852E /* GKPhotoBrowser.h */,
 				5B45BCC319AC16C10077852E /* GKPhotoBrowser.m */,
 				5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */,
-				5B45BCC719AC35CA0077852E /* GKPaddedLabel.h */,
-				5B45BCC819AC35CA0077852E /* GKPaddedLabel.m */,
 				5B45BCA319AC158C0077852E /* Images.xcassets */,
 				5B45BCA019AC158C0077852E /* MainViewController.h */,
 				5B45BCA119AC158C0077852E /* MainViewController.m */,
@@ -278,7 +273,6 @@
 				5B45BC9919AC158C0077852E /* AppDelegate.m in Sources */,
 				5B45BC9519AC158C0077852E /* main.m in Sources */,
 				5B45BCC519AC16C10077852E /* GKPhotoBrowser.m in Sources */,
-				5B45BCC919AC35CA0077852E /* GKPaddedLabel.m in Sources */,
 				8EBAC02919B5874200AEB617 /* FlatPillButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
