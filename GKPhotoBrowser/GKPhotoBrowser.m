@@ -68,16 +68,18 @@
    self.dimLayer = [CALayer layer];
    self.dimLayer.frame = [UIScreen mainScreen].bounds;
    self.dimLayer.opacity = .9;
+   self.dimLayer.actions = @{@"frame" : [NSNull null], @"bounds" : [NSNull null], @"position" : [NSNull null]};
 }
 
 - (void)setupDoneButton
 {
    self.doneButton = [FlatPillButton button];
-   [self.doneButton addTarget:self
-              action:@selector(dismissBrowser:)
-    forControlEvents:UIControlEventTouchUpInside];
+   [self.doneButton addTarget:self action:@selector(dismissBrowser:) forControlEvents:UIControlEventTouchUpInside];
 
-   self.doneButton.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 55, CGRectGetHeight([UIApplication sharedApplication].statusBarFrame) + 5, 50.0, 20.0);
+   self.doneButton.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 55,
+                                      CGRectGetHeight([UIApplication sharedApplication].statusBarFrame) + 5,
+                                      50.0,
+                                      20.0);
 
    UIFont* font = [UIFont fontWithName:@"HelveticaNeue" size:12];
    NSAttributedString* attrString = [[NSAttributedString alloc] initWithString:@"Done" attributes:@{NSFontAttributeName : font,
@@ -124,6 +126,119 @@
    }
 }
 
+#pragma mark - Private
+- (void)dismissBrowser:(UIButton*)sender
+{
+   self.state = GKPhotoBrowserStateDefault;
+}
+
+- (void)toggleState
+{
+   _state = (_state == GKPhotoBrowserStateDefault) ? GKPhotoBrowserStateDisplay: GKPhotoBrowserStateDefault;
+}
+
+- (void)updateDoneButtonWithState:(GKPhotoBrowserState)state
+{
+   if (state == GKPhotoBrowserStateDisplay)
+   {
+      [self.topMostSuperview addSubview:self.doneButton];
+   }
+   else
+   {
+      [self.doneButton removeFromSuperview];
+   }
+}
+
+- (void)updateDimLayerWithState:(GKPhotoBrowserState)state
+{
+   if (state == GKPhotoBrowserStateDisplay)
+   {
+      self.dimLayer.backgroundColor = [UIColor blackColor].CGColor;
+      [self.containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
+      self.dimLayer.frame = [self.containerView.superview.layer convertRect:self.dimLayer.frame fromLayer:self.topMostSuperview.layer];
+   }
+   else
+   {
+      [self.dimLayer removeFromSuperlayer];
+      self.dimLayer.frame = [UIScreen mainScreen].bounds;
+      self.dimLayer.backgroundColor = [UIColor clearColor].CGColor;
+   }
+}
+
+- (void)toggleResizeWithState:(GKPhotoBrowserState)state
+{
+   [[UIApplication sharedApplication] setStatusBarStyle: (state != GKPhotoBrowserStateDisplay) ? UIStatusBarStyleDefault : UIStatusBarStyleLightContent];
+
+   [self.containerView.superview bringSubviewToFront:self.containerView];
+   [self.containerView.superview layoutIfNeeded];
+
+   [self updateDimLayerWithState:state];
+   [self updateDoneButtonWithState:state];
+
+   CGFloat containerViewSuperviewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+   CGFloat containerViewSuperviewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
+
+   CGFloat statusBarHeight = CGRectGetHeight([UIApplication sharedApplication].statusBarFrame);
+   CGFloat scale = containerViewSuperviewWidth / CGRectGetWidth(self.containerView.frame);
+
+   CGFloat containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * scale;
+   CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
+
+   self.textView.frame = CGRectMake(0, containerViewSuperviewHeight, containerViewSuperviewWidth, textViewHeight);
+   self.textView.layer.zPosition = 100;
+
+   CGPoint screenCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
+   CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
+   CGFloat verticalShift = self.containerViewCenterInSuperview.y - screenCenter.y + verticalOffset - statusBarHeight - 35;
+   CGFloat horizontalShift = self.containerViewCenterInSuperview.x - screenCenter.x;
+
+   CATransform3D transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
+
+   void (^zoomAnimation)() = ^
+   {
+      self.containerView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
+      self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
+   };
+
+   void (^textViewAnimation)() = ^
+   {
+      CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.containerView.superview.frame toView:self.topMostSuperview];
+      self.textView.frame = CGRectMake(0,
+                                       containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + 35,
+                                       containerViewSuperviewWidth,
+                                       textViewHeight);
+   };
+
+   void (^textViewAnimationCompletion)(BOOL finished) = ^(BOOL finished)
+   {
+      [self.browserDelegate gkPhotoBrowserDidZoom:self];
+   };
+
+   void (^zoomAnimationCompletion)(BOOL) = ^(BOOL finished)
+   {
+      if (state == GKPhotoBrowserStateDisplay)
+      {
+         [UIView animateWithDuration:.15
+                               delay:0
+                             options:UIViewAnimationOptionCurveEaseOut
+                          animations:textViewAnimation
+                          completion:textViewAnimationCompletion];
+      }
+      else
+      {
+         [self.containerView.superview sendSubviewToBack:self.containerView];
+         [self.containerView.superview layoutIfNeeded];
+         [self.browserDelegate gkPhotoBrowserDidDismiss:self];
+      }
+   };
+
+   [UIView animateWithDuration:.25
+                         delay:0
+                       options:UIViewAnimationOptionCurveEaseInOut
+                    animations:zoomAnimation
+                    completion:zoomAnimationCompletion];
+}
+
 #pragma mark - Public
 - (void)addBrowserToContainerView:(UIView *)containerView
 {
@@ -136,102 +251,6 @@
    [self.containerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:0 metrics:nil views:views]];
 
    [self setupDoneButton];
-}
-
-#pragma mark - Private
-- (void)dismissBrowser:(UIButton*)sender
-{
-   self.state = GKPhotoBrowserStateDefault;
-}
-
-- (void)toggleState
-{
-   _state = (_state == GKPhotoBrowserStateDefault) ? GKPhotoBrowserStateDisplay: GKPhotoBrowserStateDefault;
-}
-
-- (void)toggleResizeWithState:(GKPhotoBrowserState)state
-{
-   [[UIApplication sharedApplication] setStatusBarStyle: (state != GKPhotoBrowserStateDisplay) ? UIStatusBarStyleDefault : UIStatusBarStyleLightContent];
-
-   if (state == GKPhotoBrowserStateDisplay)
-   {
-      [self.topMostSuperview addSubview:self.doneButton];
-   }
-   else
-   {
-      [self.doneButton removeFromSuperview];
-   }
-   
-   [self.containerView.superview bringSubviewToFront:self.containerView];
-   [self.containerView.superview layoutIfNeeded];
-   self.textView.layer.zPosition = 100;
-
-   self.dimLayer.actions = @{@"frame" : [NSNull null], @"bounds" : [NSNull null], @"position" : [NSNull null]};
-   self.dimLayer.backgroundColor = (state == GKPhotoBrowserStateDisplay) ? [UIColor blackColor].CGColor : [UIColor clearColor].CGColor;
-   if (state == GKPhotoBrowserStateDisplay)
-   {
-      [self.containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
-
-      CGRect dimLayerFrame = self.dimLayer.frame;
-      CGRect convertedFrame = [self.topMostSuperview.layer convertRect:dimLayerFrame fromLayer:self.containerView.superview.layer];
-
-      self.dimLayer.frame = CGRectMake(0, -CGRectGetMinY(convertedFrame), CGRectGetWidth(dimLayerFrame), CGRectGetHeight(dimLayerFrame));
-   }
-   else
-   {
-      [self.dimLayer removeFromSuperlayer];
-      self.dimLayer.frame = [UIScreen mainScreen].bounds;
-   }
-
-   CGFloat containerViewSuperviewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
-   CGFloat containerViewSuperviewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
-
-   CGFloat statusBarHeight = CGRectGetHeight([UIApplication sharedApplication].statusBarFrame);
-   CGFloat scale = containerViewSuperviewWidth / CGRectGetWidth(self.containerView.frame);
-
-   CGFloat containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * scale;
-   CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
-   CGPoint screenCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
-
-   CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
-   CGFloat verticalShift = self.containerViewCenterInSuperview.y - screenCenter.y + verticalOffset - statusBarHeight - 35;
-   CGFloat horizontalShift = self.containerViewCenterInSuperview.x - screenCenter.x;
-
-   CATransform3D transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
-
-   self.textView.frame = CGRectMake(0,
-                                    containerViewSuperviewHeight,
-                                    containerViewSuperviewWidth,
-                                    textViewHeight);
-
-   [UIView animateWithDuration:.25 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-
-      self.containerView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
-      self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
-
-   } completion:^(BOOL finished){
-
-      if (state == GKPhotoBrowserStateDisplay)
-      {
-         [UIView animateWithDuration:.15 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-
-            CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.containerView.superview.frame toView:self.topMostSuperview];
-            self.textView.frame = CGRectMake(0,
-                                             containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + 35,
-                                             containerViewSuperviewWidth,
-                                             textViewHeight);
-         } completion:^(BOOL finished){
-
-            [self.browserDelegate gkPhotoBrowserDidZoom:self];
-         }];
-      }
-      else
-      {
-         [self.containerView.superview sendSubviewToBack:self.containerView];
-         [self.containerView.superview layoutIfNeeded];
-         [self.browserDelegate gkPhotoBrowserDidDismiss:self];
-      }
-   }];
 }
 
 @end
