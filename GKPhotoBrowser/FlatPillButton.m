@@ -66,6 +66,17 @@ const CGFloat kFlatPillButtonNormalLineWidth = 2.0;
  
   CGContextAddPath(ctx, outlinePath.CGPath);
   CGContextStrokePath(ctx);
+
+   if (self.backButton)
+   {
+      UIBezierPath* backPath = [UIBezierPath bezierPath];
+      [backPath moveToPoint:CGPointMake(CGRectGetMaxX(rect)*.6, CGRectGetMaxY(rect)*.25)];
+      [backPath addLineToPoint:CGPointMake(CGRectGetMaxX(rect)*.3, CGRectGetMidY(rect))];
+      [backPath addLineToPoint:CGPointMake(CGRectGetMaxX(rect)*.6, CGRectGetMaxY(rect)*.75)];
+
+      CGContextAddPath(ctx, backPath.CGPath);
+      CGContextStrokePath(ctx);
+   }
   
   CGContextRestoreGState(ctx);
   
