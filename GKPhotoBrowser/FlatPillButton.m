@@ -69,6 +69,9 @@ const CGFloat kFlatPillButtonNormalLineWidth = 2.0;
 
    if (self.backButton)
    {
+
+      CGContextSetLineWidth(ctx, kFlatPillButtonBoldLineWidth);
+
       UIBezierPath* backPath = [UIBezierPath bezierPath];
       [backPath moveToPoint:CGPointMake(CGRectGetMaxX(rect)*.6, CGRectGetMaxY(rect)*.25)];
       [backPath addLineToPoint:CGPointMake(CGRectGetMaxX(rect)*.3, CGRectGetMidY(rect))];
@@ -78,7 +81,8 @@ const CGFloat kFlatPillButtonNormalLineWidth = 2.0;
       CGContextStrokePath(ctx);
    }
   
-  CGContextRestoreGState(ctx);
+   CGContextRestoreGState(ctx);
+   CGContextSetLineWidth(ctx, lineWidth);
   
   if (self.highlighted) {
     CGContextSaveGState(ctx);
