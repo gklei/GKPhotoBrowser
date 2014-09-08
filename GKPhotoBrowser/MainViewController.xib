@@ -31,11 +31,11 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6a2-IR-scP">
-                    <rect key="frame" x="114" y="74" width="92" height="92"/>
+                    <rect key="frame" x="56" y="74" width="150" height="92"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" red="1" green="0.0" blue="0.27382169090000003" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="92" id="VBF-gK-Gbe"/>
+                        <constraint firstAttribute="width" constant="150" id="VBF-gK-Gbe"/>
                         <constraint firstAttribute="height" constant="92" id="XDl-T6-BHY"/>
                     </constraints>
                 </view>

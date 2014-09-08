@@ -44,7 +44,8 @@
 {
    [super viewDidLoad];
    self.view.translatesAutoresizingMaskIntoConstraints = NO;
-   
+   self.respectImageAspectRatio = YES;
+
    [self setupTextView];
    [self setupDimLayer];
 }
@@ -59,8 +60,6 @@
    self.textView.showsVerticalScrollIndicator = NO;
    self.textView.editable = NO;
    self.textView.selectable = NO;
-
-   [self.containerView.superview addSubview:self.textView];
 }
 
 - (void)setupDimLayer
@@ -169,6 +168,11 @@
 {
    [[UIApplication sharedApplication] setStatusBarStyle: (state != GKPhotoBrowserStateDisplay) ? UIStatusBarStyleDefault : UIStatusBarStyleLightContent];
 
+   if (self.textView.superview == nil)
+   {
+      [self.topMostSuperview addSubview:self.textView];
+   }
+
    [self.containerView.superview bringSubviewToFront:self.containerView];
    [self.containerView.superview layoutIfNeeded];
 
@@ -179,9 +183,19 @@
    CGFloat containerViewSuperviewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
 
    CGFloat statusBarHeight = CGRectGetHeight([UIApplication sharedApplication].statusBarFrame);
-   CGFloat scale = containerViewSuperviewWidth / CGRectGetWidth(self.containerView.frame);
+   CGFloat xScale = containerViewSuperviewWidth / CGRectGetWidth(self.containerView.frame);
 
-   CGFloat containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * scale;
+   CGFloat containerViewTargetHeight;
+   CGFloat yScale = xScale;
+   if (self.respectImageAspectRatio)
+   {
+      containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
+      yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
+   }
+   else
+   {
+      containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
+   }
    CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
 
    self.textView.frame = CGRectMake(0, containerViewSuperviewHeight, containerViewSuperviewWidth, textViewHeight);
@@ -196,17 +210,18 @@
 
    void (^zoomAnimation)() = ^
    {
-      self.containerView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, scale, scale, 1) : CATransform3DIdentity;
+      self.containerView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
       self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
    };
 
    void (^textViewAnimation)() = ^
    {
-      CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.containerView.superview.frame toView:self.topMostSuperview];
+      CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.textView.superview.frame toView:self.topMostSuperview];
+      CGFloat doneButtonVerticalPadding = 35;
       self.textView.frame = CGRectMake(0,
-                                       containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + 35,
+                                       containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + doneButtonVerticalPadding,
                                        containerViewSuperviewWidth,
-                                       textViewHeight);
+                                       textViewHeight - doneButtonVerticalPadding - 10);
    };
 
    void (^textViewAnimationCompletion)(BOOL finished) = ^(BOOL finished)
@@ -228,6 +243,7 @@
       {
          [self.containerView.superview sendSubviewToBack:self.containerView];
          [self.containerView.superview layoutIfNeeded];
+
          [self.browserDelegate gkPhotoBrowserDidDismiss:self];
       }
    };
