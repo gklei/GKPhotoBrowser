@@ -24,8 +24,11 @@ typedef NS_ENUM(NSUInteger, GKPhotoBrowserState)
 
 @property (nonatomic) UIImage* image;
 @property (nonatomic) NSString* text;
-@property (nonatomic) BOOL respectImageAspectRatio;
 @property (nonatomic) GKPhotoBrowserState state;
+
+@property (nonatomic) BOOL useTapRecognizerForDisplay;
+@property (nonatomic) BOOL respectImageAspectRatio;
+
 @property (weak) NSObject<GKPhotoBrowserDelegate>* browserDelegate;
 
 + (instancetype)browser;

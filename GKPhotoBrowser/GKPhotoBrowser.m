@@ -14,11 +14,14 @@
 @property (weak) IBOutlet UIImageView* imageView;
 
 @property (nonatomic) UIView* containerView;
-@property (nonatomic) UITextView* textView;
-@property (nonatomic) CALayer* dimLayer;
-@property (nonatomic, readonly) CGPoint containerViewCenterInSuperview;
 @property (nonatomic) UIView* topMostSuperview;
+@property (nonatomic) UITextView* textView;
+
+@property (nonatomic) CALayer* dimLayer;
 @property (nonatomic) FlatPillButton* doneButton;
+@property (nonatomic, readonly) CGPoint containerViewCenterInSuperview;
+
+@property (nonatomic) UITapGestureRecognizer* tapRecognizer;
 
 @end
 
@@ -29,6 +32,7 @@
    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
    {
       self.state = GKPhotoBrowserStateDefault;
+      self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(zoom:)];
    }
    return self;
 }
@@ -44,7 +48,6 @@
 {
    [super viewDidLoad];
    self.view.translatesAutoresizingMaskIntoConstraints = NO;
-   self.respectImageAspectRatio = YES;
 
    [self setupTextView];
    [self setupDimLayer];
@@ -125,7 +128,27 @@
    }
 }
 
+- (void)setUseTapRecognizerForDisplay:(BOOL)useTapRecognizerForDisplay
+{
+   if (_useTapRecognizerForDisplay != useTapRecognizerForDisplay)
+   {
+      if (useTapRecognizerForDisplay)
+      {
+         [self.view addGestureRecognizer:self.tapRecognizer];
+      }
+      else
+      {
+         [self.view removeGestureRecognizer:self.tapRecognizer];
+      }
+   }
+}
+
 #pragma mark - Private
+- (void)zoom:(UIGestureRecognizer*)recognizer
+{
+   self.state = GKPhotoBrowserStateDisplay;
+}
+
 - (void)dismissBrowser:(UIButton*)sender
 {
    self.state = GKPhotoBrowserStateDefault;
