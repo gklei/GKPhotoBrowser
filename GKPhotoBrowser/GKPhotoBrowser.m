@@ -17,6 +17,8 @@
 @property (nonatomic) UIView* topMostSuperview;
 @property (nonatomic) UITextView* textView;
 
+@property (nonatomic) UIView* containerZoomView;
+
 @property (nonatomic) CALayer* dimLayer;
 @property (nonatomic) FlatPillButton* doneButton;
 @property (nonatomic, readonly) CGPoint containerViewCenterInSuperview;
@@ -93,6 +95,7 @@
 #pragma mark - Property Overrides
 - (void)setImage:(UIImage *)image
 {
+   self.containerZoomView.layer.contents = (__bridge id)image.CGImage;
    [self.imageView setImage:image];
 }
 
@@ -176,13 +179,11 @@
    if (state == GKPhotoBrowserStateDisplay)
    {
       self.dimLayer.backgroundColor = [UIColor blackColor].CGColor;
-      [self.containerView.superview.layer insertSublayer:self.dimLayer below:self.containerView.layer];
-      self.dimLayer.frame = [self.containerView.superview.layer convertRect:self.dimLayer.frame fromLayer:self.topMostSuperview.layer];
+      [self.topMostSuperview.layer addSublayer:self.dimLayer];
    }
    else
    {
       [self.dimLayer removeFromSuperlayer];
-      self.dimLayer.frame = [UIScreen mainScreen].bounds;
       self.dimLayer.backgroundColor = [UIColor clearColor].CGColor;
    }
 }
@@ -196,11 +197,15 @@
       [self.topMostSuperview addSubview:self.textView];
    }
 
-   [self.containerView.superview bringSubviewToFront:self.containerView];
-   [self.containerView.superview layoutIfNeeded];
-
    [self updateDimLayerWithState:state];
    [self updateDoneButtonWithState:state];
+
+   if (self.containerZoomView.superview == nil)
+   {
+      self.containerZoomView.frame = [self.containerView.superview convertRect:self.containerView.frame toView:self.topMostSuperview];
+      [self.topMostSuperview addSubview:self.containerZoomView];
+      self.containerView.hidden = YES;
+   }
 
    CGFloat containerViewSuperviewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
    CGFloat containerViewSuperviewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
@@ -233,7 +238,7 @@
 
    void (^zoomAnimation)() = ^
    {
-      self.containerView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
+      self.containerZoomView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
       self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
    };
 
@@ -264,9 +269,8 @@
       }
       else
       {
-         [self.containerView.superview sendSubviewToBack:self.containerView];
-         [self.containerView.superview layoutIfNeeded];
-
+         self.containerView.hidden = NO;
+         [self.containerZoomView removeFromSuperview];
          [self.browserDelegate gkPhotoBrowserDidDismiss:self];
       }
    };
@@ -290,6 +294,8 @@
    [self.containerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:0 metrics:nil views:views]];
 
    [self setupDoneButton];
+
+   self.containerZoomView = [[UIView alloc] initWithFrame:self.containerView.frame];
 }
 
 @end
