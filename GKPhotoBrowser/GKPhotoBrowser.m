@@ -283,6 +283,7 @@
 
    if (state == GKPhotoBrowserStateDisplay)
    {
+      [self.browserDelegate gkPhotoBrowserWillZoom:self];
       [UIView animateWithDuration:.25
                             delay:0
                           options:UIViewAnimationOptionCurveEaseOut
@@ -291,6 +292,7 @@
    }
    else
    {
+      [self.browserDelegate gkPHotoBrowserWillDismiss:self];
       [UIView animateWithDuration:.5
                             delay:0
            usingSpringWithDamping:.75
