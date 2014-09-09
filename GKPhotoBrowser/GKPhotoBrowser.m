@@ -57,7 +57,7 @@
    [self setupDimLayer];
 }
 
-#pragma mark - Setup
+#pragma mark - Setup   
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
@@ -309,6 +309,7 @@
 #pragma mark - Public
 - (void)addBrowserToContainerView:(UIView *)containerView inParentController:(UIViewController*)parentController
 {
+   self.parentController = parentController;
    self.containerView = containerView;
    [self.containerView addSubview:self.view];
 
