@@ -273,15 +273,7 @@
 
    void (^zoomAnimationCompletion)(BOOL) = ^(BOOL finished)
    {
-      if (state == GKPhotoBrowserStateDisplay)
-      {
-         [UIView animateWithDuration:.15
-                               delay:0
-                             options:UIViewAnimationOptionCurveEaseOut
-                          animations:textViewAnimation
-                          completion:textViewAnimationCompletion];
-      }
-      else
+      if (state == GKPhotoBrowserStateDefault)
       {
          self.containerView.hidden = NO;
          [self.containerZoomView removeFromSuperview];
@@ -289,11 +281,30 @@
       }
    };
 
-   [UIView animateWithDuration:.25
+   if (state == GKPhotoBrowserStateDisplay)
+   {
+      [UIView animateWithDuration:.25
+                            delay:0
+                          options:UIViewAnimationOptionCurveEaseOut
+                       animations:zoomAnimation
+                       completion:zoomAnimationCompletion];
+   }
+   else
+   {
+      [UIView animateWithDuration:.5
+                            delay:0
+           usingSpringWithDamping:.75
+            initialSpringVelocity:1.5
+                          options:UIViewAnimationOptionCurveEaseInOut
+                       animations:zoomAnimation
+                       completion:zoomAnimationCompletion];
+   }
+
+   [UIView animateWithDuration:.3
                          delay:0
-                       options:UIViewAnimationOptionCurveEaseInOut
-                    animations:zoomAnimation
-                    completion:zoomAnimationCompletion];
+                       options:UIViewAnimationOptionCurveEaseOut
+                    animations:textViewAnimation
+                    completion:textViewAnimationCompletion];
 }
 
 - (void)setParentNavigationBarsHidden:(BOOL)hidden
