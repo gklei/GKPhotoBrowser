@@ -35,31 +35,31 @@
    [super viewDidLoad];
 
    self.photoBrowser1 = [GKPhotoBrowser browser];
-   [self.photoBrowser1 addBrowserToContainerView:self.photoBrowserContainer];
+   [self.photoBrowser1 addBrowserToContainerView:self.photoBrowserContainer inParentController:self];
    self.photoBrowser1.browserDelegate = self;
    
    self.photoBrowser1.image = [UIImage imageNamed:@"(3) Low In Carrige"];
    self.photoBrowser1.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
-   self.photoBrowser1.useTapRecognizerForDisplay = YES;
-   self.photoBrowser1.respectImageAspectRatio = YES;
+   self.photoBrowser1.usesTapRecognizerForDisplay = YES;
+   self.photoBrowser1.respectsImageAspectRatio = YES;
 
    self.photoBrowser2 = [GKPhotoBrowser browser];
    self.photoBrowser2.browserDelegate = self;
-   [self.photoBrowser2 addBrowserToContainerView:self.photoBrowserContainer2];
+   [self.photoBrowser2 addBrowserToContainerView:self.photoBrowserContainer2 inParentController:self];
 
    self.photoBrowser2.image = [UIImage imageNamed:@"(7) Spacer Ring"];
    self.photoBrowser2.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
-   self.photoBrowser2.useTapRecognizerForDisplay = YES;
-   self.photoBrowser2.respectImageAspectRatio = YES;
+   self.photoBrowser2.usesTapRecognizerForDisplay = YES;
+   self.photoBrowser2.respectsImageAspectRatio = YES;
 
    self.photoBrowser3 = [GKPhotoBrowser browser];
-   [self.photoBrowser3 addBrowserToContainerView:self.photoBrowserContainer3];
+   [self.photoBrowser3 addBrowserToContainerView:self.photoBrowserContainer3 inParentController:self];
    self.photoBrowser3.browserDelegate = self;
 
    self.photoBrowser3.image = [UIImage imageNamed:@"(6) Core Extension"];
    self.photoBrowser3.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
-   self.photoBrowser3.useTapRecognizerForDisplay = YES;
-   self.photoBrowser3.respectImageAspectRatio = YES;
+   self.photoBrowser3.usesTapRecognizerForDisplay = YES;
+   self.photoBrowser3.respectsImageAspectRatio = YES;
 
    self.browsers = @[self.photoBrowser1, self.photoBrowser2, self.photoBrowser3];
 }
@@ -84,7 +84,7 @@
    {
       if (b != browser)
       {
-         browser.useTapRecognizerForDisplay = NO;
+         browser.usesTapRecognizerForDisplay = NO;
       }
    }
 }
@@ -93,7 +93,7 @@
 {
    for (GKPhotoBrowser* b in self.browsers)
    {
-      b.useTapRecognizerForDisplay = YES;
+      b.usesTapRecognizerForDisplay = YES;
    }
 }
 

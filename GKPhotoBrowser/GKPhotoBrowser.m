@@ -18,6 +18,7 @@
 @property (nonatomic) UITextView* textView;
 
 @property (nonatomic) UIView* containerZoomView;
+@property (nonatomic) UIViewController* parentController;
 
 @property (nonatomic) CALayer* dimLayer;
 @property (nonatomic) FlatPillButton* doneButton;
@@ -34,6 +35,7 @@
    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
    {
       self.state = GKPhotoBrowserStateDefault;
+      self.hidesParentNavigationBarsOnZoom = YES;
       self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(zoom:)];
    }
    return self;
@@ -59,7 +61,7 @@
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
-   [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14]];
+   [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:16]];
    self.textView.backgroundColor = [UIColor clearColor];
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = NO;
@@ -80,12 +82,14 @@
    self.doneButton = [FlatPillButton button];
    [self.doneButton addTarget:self action:@selector(dismissBrowser:) forControlEvents:UIControlEventTouchUpInside];
 
-   self.doneButton.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 55,
-                                      CGRectGetHeight([UIApplication sharedApplication].statusBarFrame) + 5,
-                                      50.0,
-                                      20.0);
+   CGSize doneButtonSize = {60, 30};
+   CGFloat padding = 5;
+   self.doneButton.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - doneButtonSize.width - padding,
+                                      CGRectGetHeight([UIApplication sharedApplication].statusBarFrame) + padding,
+                                      60.0,
+                                      30.0);
 
-   UIFont* font = [UIFont fontWithName:@"HelveticaNeue" size:12];
+   UIFont* font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
    NSAttributedString* attrString = [[NSAttributedString alloc] initWithString:@"Done" attributes:@{NSFontAttributeName : font,
                                                                                                     NSForegroundColorAttributeName : [UIColor whiteColor]}];
    [self.doneButton setAttributedTitle:attrString forState:UIControlStateNormal];
@@ -127,15 +131,16 @@
    if (_state != state)
    {
       [self toggleState];
+      [self updateParentNavigationBarsForState:self.state];
       [self toggleResizeWithState:self.state];
    }
 }
 
-- (void)setUseTapRecognizerForDisplay:(BOOL)useTapRecognizerForDisplay
+- (void)setUsesTapRecognizerForDisplay:(BOOL)usesTapRecognizerForDisplay
 {
-   if (_useTapRecognizerForDisplay != useTapRecognizerForDisplay)
+   if (_usesTapRecognizerForDisplay != usesTapRecognizerForDisplay)
    {
-      if (useTapRecognizerForDisplay)
+      if (usesTapRecognizerForDisplay)
       {
          [self.view addGestureRecognizer:self.tapRecognizer];
       }
@@ -160,6 +165,15 @@
 - (void)toggleState
 {
    _state = (_state == GKPhotoBrowserStateDefault) ? GKPhotoBrowserStateDisplay: GKPhotoBrowserStateDefault;
+}
+
+- (void)updateParentNavigationBarsForState:(GKPhotoBrowserState)state
+{
+   if (self.hidesParentNavigationBarsOnZoom)
+   {
+      BOOL hidden = state == GKPhotoBrowserStateDisplay;
+      [self setParentNavigationBarsHidden:hidden];
+   }
 }
 
 - (void)updateDoneButtonWithState:(GKPhotoBrowserState)state
@@ -215,7 +229,7 @@
 
    CGFloat containerViewTargetHeight;
    CGFloat yScale = xScale;
-   if (self.respectImageAspectRatio)
+   if (self.respectsImageAspectRatio)
    {
       containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
       yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
@@ -231,7 +245,7 @@
 
    CGPoint screenCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
    CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
-   CGFloat verticalShift = self.containerViewCenterInSuperview.y - screenCenter.y + verticalOffset - statusBarHeight - 35;
+   CGFloat verticalShift = self.containerViewCenterInSuperview.y - screenCenter.y + verticalOffset - statusBarHeight - CGRectGetHeight(self.doneButton.frame) - 10;
    CGFloat horizontalShift = self.containerViewCenterInSuperview.x - screenCenter.x;
 
    CATransform3D transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
@@ -245,7 +259,7 @@
    void (^textViewAnimation)() = ^
    {
       CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.textView.superview.frame toView:self.topMostSuperview];
-      CGFloat doneButtonVerticalPadding = 35;
+      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 10;
       self.textView.frame = CGRectMake(0,
                                        containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + doneButtonVerticalPadding,
                                        containerViewSuperviewWidth,
@@ -282,8 +296,18 @@
                     completion:zoomAnimationCompletion];
 }
 
+- (void)setParentNavigationBarsHidden:(BOOL)hidden
+{
+   UIViewController* parentViewController = self.parentController;
+   while (parentViewController != nil)
+   {
+      parentViewController.navigationController.navigationBarHidden = hidden;
+      parentViewController = parentViewController.parentViewController;
+   }
+}
+
 #pragma mark - Public
-- (void)addBrowserToContainerView:(UIView *)containerView
+- (void)addBrowserToContainerView:(UIView *)containerView inParentController:(UIViewController*)parentController
 {
    self.containerView = containerView;
    [self.containerView addSubview:self.view];
