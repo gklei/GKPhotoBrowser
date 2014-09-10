@@ -24,7 +24,6 @@
 		5B45BCC519AC16C10077852E /* GKPhotoBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B45BCC319AC16C10077852E /* GKPhotoBrowser.m */; };
 		5B45BCC619AC16C10077852E /* GKPhotoBrowser.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */; };
 		8EBAC02919B5874200AEB617 /* FlatPillButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EBAC02619B5874200AEB617 /* FlatPillButton.m */; };
-		8EBAC02A19B5874200AEB617 /* FlatPillButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EBAC02819B5874200AEB617 /* FlatPillButtonCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,8 +61,6 @@
 		5B45BCC419AC16C10077852E /* GKPhotoBrowser.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GKPhotoBrowser.xib; sourceTree = "<group>"; };
 		8EBAC02519B5874200AEB617 /* FlatPillButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlatPillButton.h; sourceTree = "<group>"; };
 		8EBAC02619B5874200AEB617 /* FlatPillButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlatPillButton.m; sourceTree = "<group>"; };
-		8EBAC02719B5874200AEB617 /* FlatPillButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlatPillButtonCell.h; sourceTree = "<group>"; };
-		8EBAC02819B5874200AEB617 /* FlatPillButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlatPillButtonCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,8 +122,6 @@
 			children = (
 				8EBAC02519B5874200AEB617 /* FlatPillButton.h */,
 				8EBAC02619B5874200AEB617 /* FlatPillButton.m */,
-				8EBAC02719B5874200AEB617 /* FlatPillButtonCell.h */,
-				8EBAC02819B5874200AEB617 /* FlatPillButtonCell.m */,
 				5B45BC9719AC158C0077852E /* AppDelegate.h */,
 				5B45BC9819AC158C0077852E /* AppDelegate.m */,
 				5B45BCC219AC16C10077852E /* GKPhotoBrowser.h */,
@@ -269,7 +264,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B45BCA219AC158C0077852E /* MainViewController.m in Sources */,
-				8EBAC02A19B5874200AEB617 /* FlatPillButtonCell.m in Sources */,
 				5B45BC9919AC158C0077852E /* AppDelegate.m in Sources */,
 				5B45BC9519AC158C0077852E /* main.m in Sources */,
 				5B45BCC519AC16C10077852E /* GKPhotoBrowser.m in Sources */,
