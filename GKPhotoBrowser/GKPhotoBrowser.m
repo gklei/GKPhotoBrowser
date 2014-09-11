@@ -57,7 +57,7 @@
    [self setupDimLayer];
 }
 
-#pragma mark - Setup   
+#pragma mark - Setup
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
