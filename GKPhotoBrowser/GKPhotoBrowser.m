@@ -311,7 +311,7 @@
 
 - (void)setParentNavigationBarsHidden:(BOOL)hidden
 {
-   UIViewController* parentViewController = self.parentController;
+   UIViewController* parentViewController = self.parentController.parentViewController;
    while (parentViewController != nil)
    {
       parentViewController.navigationController.navigationBarHidden = hidden;
