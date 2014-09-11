@@ -229,7 +229,7 @@
 
    CGFloat containerViewTargetHeight;
    CGFloat yScale = xScale;
-   if (self.respectsImageAspectRatio)
+   if (self.respectsImageAspectRatio && self.imageView.image)
    {
       containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
       yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
