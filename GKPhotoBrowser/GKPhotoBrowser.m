@@ -259,7 +259,7 @@
    void (^textViewAnimation)() = ^
    {
       CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.textView.superview.frame toView:self.topMostSuperview];
-      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 10;
+      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 20;
       self.textView.frame = CGRectMake(0,
                                        containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + doneButtonVerticalPadding,
                                        containerViewSuperviewWidth,
