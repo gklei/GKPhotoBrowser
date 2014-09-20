@@ -68,12 +68,11 @@
    CGFloat headerYPosition = CGRectGetMinY(self.doneButton.frame);
 
    self.headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(headerXPosition, headerYPosition, headerWidth, headerHeight)];
-   self.headerLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:24];
+   self.headerLabel.font = [UIFont fontWithName:@"HelveticaNeue-CondensedBold" size:24];
    self.headerLabel.textColor = [UIColor whiteColor];
    self.headerLabel.textAlignment = NSTextAlignmentCenter;
    self.headerLabel.text = self.headerText;
 
-   self.headerText = @"Header Label";
    [self sizeLabel:self.headerLabel toRect:self.headerLabel.frame];
 }
 
