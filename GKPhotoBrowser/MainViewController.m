@@ -37,6 +37,7 @@
    self.photoBrowser1 = [GKPhotoBrowser browser];
    [self.photoBrowser1 addBrowserToContainerView:self.photoBrowserContainer inParentController:self];
    self.photoBrowser1.browserDelegate = self;
+   self.photoBrowser1.headerText = @"Header Text";
    
    self.photoBrowser1.image = [UIImage imageNamed:@"(3) Low In Carrige"];
    self.photoBrowser1.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
@@ -51,6 +52,7 @@
    self.photoBrowser2.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
    self.photoBrowser2.usesTapRecognizerForDisplay = YES;
    self.photoBrowser2.respectsImageAspectRatio = YES;
+   self.photoBrowser2.headerText = @"Header Text";
 
    self.photoBrowser3 = [GKPhotoBrowser browser];
    [self.photoBrowser3 addBrowserToContainerView:self.photoBrowserContainer3 inParentController:self];
@@ -60,6 +62,7 @@
    self.photoBrowser3.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
    self.photoBrowser3.usesTapRecognizerForDisplay = YES;
    self.photoBrowser3.respectsImageAspectRatio = YES;
+   self.photoBrowser3.headerText = @"Header Text";
 
    self.browsers = @[self.photoBrowser1, self.photoBrowser2, self.photoBrowser3];
 }
@@ -78,6 +81,14 @@
 }
 
 #pragma mark - GKPhotoBrowser Delegate
+- (void)gkPhotoBrowserWillZoom:(GKPhotoBrowser *)browser
+{
+}
+
+- (void)gkPHotoBrowserWillDismiss:(GKPhotoBrowser *)broswer
+{
+}
+
 - (void)gkPhotoBrowserDidZoom:(GKPhotoBrowser *)browser
 {
    for (GKPhotoBrowser* b in self.browsers)

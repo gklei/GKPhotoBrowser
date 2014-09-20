@@ -15,6 +15,7 @@
 
 @property (nonatomic) UIView* containerView;
 @property (nonatomic) UIView* topMostSuperview;
+@property (nonatomic) UILabel* headerLabel;
 @property (nonatomic) UITextView* textView;
 
 @property (nonatomic) UIView* containerZoomView;
@@ -58,6 +59,24 @@
 }
 
 #pragma mark - Setup
+- (void)setupHeaderLabel
+{
+   CGFloat widthOfButtonAndPadding = CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMinX(self.doneButton.frame);
+   CGFloat headerWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - widthOfButtonAndPadding*2 - 8;
+   CGFloat headerHeight = CGRectGetMaxY(self.doneButton.frame) - CGRectGetMinY(self.doneButton.frame);
+   CGFloat headerXPosition = CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMinX(self.doneButton.frame);
+   CGFloat headerYPosition = CGRectGetMinY(self.doneButton.frame);
+
+   self.headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(headerXPosition, headerYPosition, headerWidth, headerHeight)];
+   self.headerLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:24];
+   self.headerLabel.textColor = [UIColor whiteColor];
+   self.headerLabel.textAlignment = NSTextAlignmentCenter;
+   self.headerLabel.text = self.headerText;
+
+   self.headerText = @"Header Label";
+   [self sizeLabel:self.headerLabel toRect:self.headerLabel.frame];
+}
+
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
@@ -151,6 +170,16 @@
    }
 }
 
+- (void)setHeaderText:(NSString *)headerText
+{
+   if (_headerText != headerText)
+   {
+      _headerText = headerText;
+      self.headerLabel.text = _headerText;
+      [self sizeLabel:self.headerLabel toRect:self.headerLabel.frame];
+   }
+}
+
 #pragma mark - Private
 - (void)zoom:(UIGestureRecognizer*)recognizer
 {
@@ -211,6 +240,7 @@
       [self.topMostSuperview addSubview:self.textView];
    }
 
+   [self.topMostSuperview addSubview:self.headerLabel];
    [self updateDimLayerWithState:state];
    [self updateDoneButtonWithState:state];
 
@@ -242,6 +272,7 @@
 
    self.textView.frame = CGRectMake(0, containerViewSuperviewHeight, containerViewSuperviewWidth, textViewHeight);
    self.textView.layer.zPosition = 100;
+   self.headerLabel.layer.zPosition = 100;
 
    CGPoint screenCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
    CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
@@ -254,6 +285,10 @@
    {
       self.containerZoomView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
       self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
+      if (state == GKPhotoBrowserStateDefault)
+      {
+         [self.headerLabel removeFromSuperview];
+      }
    };
 
    void (^textViewAnimation)() = ^
@@ -319,6 +354,43 @@
    }
 }
 
+- (void)sizeLabel:(UILabel*)label toRect:(CGRect)labelRect
+{
+   // Set the frame of the label to the targeted rectangle
+   label.frame = labelRect;
+
+   // Try all font sizes from largest to smallest font size
+   int fontSize = 300;
+   int minFontSize = 5;
+
+   // Fit label width wize
+   CGSize constraintSize = CGSizeMake(label.frame.size.width, MAXFLOAT);
+
+   do {
+      // Set current font size
+      label.font = [UIFont fontWithName:label.font.fontName size:fontSize];
+
+      // Find label size for current font size
+      CGRect textRect = [[label text] boundingRectWithSize:constraintSize
+                                                   options:NSStringDrawingUsesLineFragmentOrigin
+                                                attributes:@{NSFontAttributeName:label.font}
+                                                   context:nil];
+
+      CGSize labelSize = textRect.size;
+
+      // Done, if created label is within target size
+      CGFloat labelWidth = [label.text sizeWithAttributes:@{NSFontAttributeName : label.font}].width;
+      if (labelSize.height <= CGRectGetHeight(label.frame) && labelWidth <= CGRectGetWidth(label.frame))
+      {
+         break;
+      }
+
+      // Decrease the font size and try again
+      fontSize -= 2;
+
+   } while (fontSize > minFontSize);
+}
+
 #pragma mark - Public
 - (void)addBrowserToContainerView:(UIView *)containerView inParentController:(UIViewController*)parentController
 {
@@ -332,6 +404,7 @@
    [self.containerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:0 metrics:nil views:views]];
 
    [self setupDoneButton];
+   [self setupHeaderLabel];
 
    self.containerZoomView = [[UIView alloc] initWithFrame:self.containerView.frame];
 }

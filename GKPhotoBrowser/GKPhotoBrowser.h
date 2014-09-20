@@ -26,6 +26,7 @@ typedef NS_ENUM(NSUInteger, GKPhotoBrowserState)
 @interface GKPhotoBrowser : UIViewController
 
 @property (nonatomic) UIImage* image;
+@property (nonatomic) NSString* headerText;
 @property (nonatomic) NSString* text;
 
 @property (nonatomic) BOOL usesTapRecognizerForDisplay;
