@@ -80,7 +80,7 @@
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
-   [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:20]];
+   [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:18]];
    self.textView.backgroundColor = [UIColor clearColor];
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = NO;
