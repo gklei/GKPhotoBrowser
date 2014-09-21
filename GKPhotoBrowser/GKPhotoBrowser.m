@@ -8,6 +8,7 @@
 
 #import "GKPhotoBrowser.h"
 #import "FlatPillButton.h"
+#import "UIImage+ImageEffects.h"
 
 @interface GKPhotoBrowser () <UIGestureRecognizerDelegate>
 
@@ -91,7 +92,6 @@
 {
    self.dimLayer = [CALayer layer];
    self.dimLayer.frame = [UIScreen mainScreen].bounds;
-   self.dimLayer.opacity = .9;
    self.dimLayer.actions = @{@"frame" : [NSNull null], @"bounds" : [NSNull null], @"position" : [NSNull null]};
 }
 
@@ -220,13 +220,12 @@
 {
    if (state == GKPhotoBrowserStateDisplay)
    {
-      self.dimLayer.backgroundColor = [UIColor blackColor].CGColor;
+      self.dimLayer.contents = (id)[self blurredSnapshot].CGImage;
       [self.topMostSuperview.layer addSublayer:self.dimLayer];
    }
    else
    {
       [self.dimLayer removeFromSuperlayer];
-      self.dimLayer.backgroundColor = [UIColor clearColor].CGColor;
    }
 }
 
@@ -234,19 +233,20 @@
 {
    [[UIApplication sharedApplication] setStatusBarStyle: (state != GKPhotoBrowserStateDisplay) ? UIStatusBarStyleDefault : UIStatusBarStyleLightContent];
 
+   UIView* topMostSuperview = self.topMostSuperview;
    if (self.textView.superview == nil)
    {
-      [self.topMostSuperview addSubview:self.textView];
+      [topMostSuperview addSubview:self.textView];
    }
 
-   [self.topMostSuperview addSubview:self.headerLabel];
+   [topMostSuperview addSubview:self.headerLabel];
    [self updateDimLayerWithState:state];
    [self updateDoneButtonWithState:state];
 
    if (self.containerZoomView.superview == nil)
    {
-      self.containerZoomView.frame = [self.containerView.superview convertRect:self.containerView.frame toView:self.topMostSuperview];
-      [self.topMostSuperview addSubview:self.containerZoomView];
+      self.containerZoomView.frame = [self.containerView.superview convertRect:self.containerView.frame toView:topMostSuperview];
+      [topMostSuperview addSubview:self.containerZoomView];
       self.containerView.hidden = YES;
    }
 
@@ -292,7 +292,7 @@
 
    void (^textViewAnimation)() = ^
    {
-      CGRect containerFrameInTopMostSuperview = [self.topMostSuperview convertRect:self.textView.superview.frame toView:self.topMostSuperview];
+      CGRect containerFrameInTopMostSuperview = [topMostSuperview convertRect:self.textView.superview.frame toView:topMostSuperview];
       CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 20;
       self.textView.frame = CGRectMake(0,
                                        containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + doneButtonVerticalPadding,
@@ -388,6 +388,23 @@
       fontSize -= 2;
 
    } while (fontSize > minFontSize);
+}
+
+- (UIImage*)blurredSnapshot
+{
+   UIView* topMostSuperview = self.topMostSuperview;
+   UIGraphicsBeginImageContextWithOptions(CGSizeMake(CGRectGetWidth(topMostSuperview.frame),
+                                                     CGRectGetHeight(topMostSuperview.frame)),
+                                          NO, 1.0f);
+   [topMostSuperview drawViewHierarchyInRect:CGRectMake(0, 0, CGRectGetWidth(topMostSuperview.frame), CGRectGetHeight(topMostSuperview.frame)) afterScreenUpdates:NO];
+   UIImage *snapshotImage = UIGraphicsGetImageFromCurrentImageContext();
+
+   // Now apply the blur effect using Apple's UIImageEffect category
+   UIImage *blurredSnapshotImage = [snapshotImage applyDarkEffect];
+
+   UIGraphicsEndImageContext();
+
+   return blurredSnapshotImage;
 }
 
 #pragma mark - Public
