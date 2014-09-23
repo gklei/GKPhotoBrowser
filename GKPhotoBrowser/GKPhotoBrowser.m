@@ -277,16 +277,25 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    CGFloat xScale = containerViewSuperviewWidth / CGRectGetWidth(self.containerView.frame);
 
    CGFloat containerViewTargetHeight;
-   CGFloat yScale = xScale;
-   if (self.respectsImageAspectRatio && self.imageView.image)
+//   CGFloat yScale = xScale;
+//   if (self.respectsImageAspectRatio && self.imageView.image)
+//   {
+//      containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
+//      yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
+//   }
+//   else
+//   {
+//      containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
+//   }
+   if (self.textView.text.length > 0)
    {
-      containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
-      yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
+      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
    }
    else
    {
-      containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
+      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.headerLabel.frame) - 20;
    }
+   CGFloat yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
    CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
 
    self.textView.frame = CGRectMake(0, containerViewSuperviewHeight, containerViewSuperviewWidth, textViewHeight);

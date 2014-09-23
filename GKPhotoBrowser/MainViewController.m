@@ -59,7 +59,7 @@
    self.photoBrowser3.browserDelegate = self;
 
    self.photoBrowser3.image = [UIImage imageNamed:@"(6) Core Extension"];
-   self.photoBrowser3.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
+//   self.photoBrowser3.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
    self.photoBrowser3.usesTapRecognizerForDisplay = YES;
    self.photoBrowser3.respectsImageAspectRatio = YES;
    self.photoBrowser3.headerText = @"Diagonal Holes";
