@@ -10,14 +10,27 @@
 #import "FlatPillButton.h"
 #import "UIImage+ImageEffects.h"
 
-@interface GKPhotoBrowser () <UIGestureRecognizerDelegate>
+static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textSize)
+{
+   NSURL* url = [NSURL URLWithString:@"GKPhotoBrowserImage"];
+   UIFont* font = [UIFont fontWithName:@"HelveticaNeue-Light" size:textSize];
+   NSDictionary* attributes = @{NSLinkAttributeName : url, NSFontAttributeName : font,
+                                NSUnderlineStyleAttributeName : @1};
+   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
+
+   return attributedString;
+}
+
+@interface GKPhotoBrowser () <UIGestureRecognizerDelegate, UITextViewDelegate>
 
 @property (weak) IBOutlet UIImageView* imageView;
+@property (nonatomic) UIImage* alternateTextViewImage;
 
 @property (nonatomic) UIView* containerView;
 @property (nonatomic) UIView* topMostSuperview;
 @property (nonatomic) UILabel* headerLabel;
 @property (nonatomic) UITextView* textView;
+@property (nonatomic) NSAttributedString* textViewAttributedText;
 
 @property (nonatomic) UIView* containerZoomView;
 @property (nonatomic) UIViewController* parentController;
@@ -85,7 +98,13 @@
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = NO;
    self.textView.editable = NO;
-   self.textView.selectable = NO;
+   self.textView.linkTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1],
+                                        NSUnderlineColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1]};
+
+   if (self.textViewAttributedText)
+   {
+      self.textView.attributedText = self.textViewAttributedText;
+   }
 }
 
 - (void)setupDimLayer
@@ -151,6 +170,7 @@
       [self toggleState];
       [self updateParentNavigationBarsForState:self.state];
       [self toggleResizeWithState:self.state];
+      [self updateImageForState:self.state];
    }
 }
 
@@ -343,6 +363,14 @@
                     completion:textViewAnimationCompletion];
 }
 
+- (void)updateImageForState:(GKPhotoBrowserState)state
+{
+   if (state == GKPhotoBrowserStateDefault)
+   {
+      self.containerZoomView.layer.contents = (__bridge id)self.imageView.image.CGImage;
+   }
+}
+
 - (void)setParentNavigationBarsHidden:(BOOL)hidden
 {
    UIViewController* parentViewController = self.parentController.parentViewController;
@@ -423,6 +451,37 @@
    [self setupHeaderLabel];
 
    self.containerZoomView = [[UIView alloc] initWithFrame:self.containerView.frame];
+}
+
+- (void)makeCaptionSubstring:(NSString *)substring hyperlinkToDisplayImage:(UIImage *)image
+{
+   self.alternateTextViewImage = image;
+   NSRange range = [self.textView.text rangeOfString:substring];
+
+   if (range.length > 0)
+   {
+      NSString* firstSubstring = [self.textView.text substringWithRange:NSMakeRange(0, range.location)];
+      NSString* secondSubstring = [self.textView.text substringFromIndex:(range.location + range.length)];
+
+      UIFont* font = [UIFont fontWithName:@"HelveticaNeue-Light" size:18];
+      NSDictionary* attributes = @{NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor]};
+
+      NSMutableAttributedString *attributedText = [NSMutableAttributedString new];
+      [attributedText appendAttributedString:[[NSAttributedString alloc] initWithString:firstSubstring attributes:attributes]];
+      [attributedText appendAttributedString:_attributedLinkForImage(substring, 18)];
+      [attributedText appendAttributedString:[[NSAttributedString alloc] initWithString:secondSubstring attributes:attributes]];
+
+      self.textViewAttributedText = attributedText;
+      self.textView.attributedText = attributedText;
+      self.textView.delegate = self;
+   }
+}
+
+#pragma mark - UITextView Delegate
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange
+{
+   self.containerZoomView.layer.contents = (__bridge id)self.alternateTextViewImage.CGImage;
+   return NO;
 }
 
 @end

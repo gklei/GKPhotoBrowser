@@ -39,6 +39,8 @@ typedef NS_ENUM(NSUInteger, GKPhotoBrowserState)
 @property (weak) NSObject<GKPhotoBrowserDelegate>* browserDelegate;
 
 + (instancetype)browser;
+
 - (void)addBrowserToContainerView:(UIView*)containerView inParentController:(UIViewController*)parentController;
+- (void)makeCaptionSubstring:(NSString*)substring hyperlinkToDisplayImage:(UIImage*)image;
 
 @end

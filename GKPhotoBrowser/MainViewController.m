@@ -63,6 +63,7 @@
    self.photoBrowser3.usesTapRecognizerForDisplay = YES;
    self.photoBrowser3.respectsImageAspectRatio = YES;
    self.photoBrowser3.headerText = @"Diagonal Holes";
+   [self.photoBrowser3 makeCaptionSubstring:@"damage on the roll surface" hyperlinkToDisplayImage:[UIImage imageNamed:@"(1) Damaged Rollers"]];
 
    self.browsers = @[self.photoBrowser1, self.photoBrowser2, self.photoBrowser3];
 }
