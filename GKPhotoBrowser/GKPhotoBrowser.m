@@ -277,25 +277,25 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    CGFloat xScale = containerViewSuperviewWidth / CGRectGetWidth(self.containerView.frame);
 
    CGFloat containerViewTargetHeight;
-//   CGFloat yScale = xScale;
-//   if (self.respectsImageAspectRatio && self.imageView.image)
-//   {
-//      containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
-//      yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
-//   }
-//   else
-//   {
-//      containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
-//   }
-   if (self.textView.text.length > 0)
+   CGFloat yScale = xScale;
+   if (self.respectsImageAspectRatio && self.imageView.image)
    {
-      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
+      containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
+      yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
    }
    else
    {
-      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.headerLabel.frame) - 20;
+      containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
    }
-   CGFloat yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
+//   if (self.textView.text.length > 0)
+//   {
+//      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
+//   }
+//   else
+//   {
+//      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.headerLabel.frame) - 20;
+//   }
+//   CGFloat yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
    CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
 
    self.textView.frame = CGRectMake(0, containerViewSuperviewHeight, containerViewSuperviewWidth, textViewHeight);
