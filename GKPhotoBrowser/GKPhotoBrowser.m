@@ -287,10 +287,10 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    {
       containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
    }
-//   if (self.textView.text.length > 0)
-//   {
-//      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
-//   }
+   if (self.textView.text.length > 0)
+   {
+      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
+   }
 //   else
 //   {
 //      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.headerLabel.frame) - 20;
