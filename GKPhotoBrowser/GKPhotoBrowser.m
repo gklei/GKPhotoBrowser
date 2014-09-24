@@ -287,15 +287,15 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    {
       containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
    }
-//   if (self.textView.text.length > 0)
-//   {
-//      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
-//   }
+   if (self.textView.text.length > 0)
+   {
+      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
+      yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
+   }
 //   else
 //   {
 //      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.headerLabel.frame) - 20;
 //   }
-//   CGFloat yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
    CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
 
    self.textView.frame = CGRectMake(0, containerViewSuperviewHeight, containerViewSuperviewWidth, textViewHeight);
