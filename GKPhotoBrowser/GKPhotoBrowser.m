@@ -97,6 +97,7 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    self.textView.backgroundColor = [UIColor clearColor];
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = YES;
+   self.textView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
    self.textView.editable = NO;
    self.textView.linkTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1],
                                         NSUnderlineColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1]};
