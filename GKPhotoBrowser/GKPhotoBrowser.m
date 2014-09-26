@@ -149,7 +149,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    self.textView.editable = NO;
    self.textView.linkTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1],
                                         NSUnderlineColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1]};
-   self.textView.textContainerInset = UIEdgeInsetsMake(10, 0, 10, 0);
+   self.textView.textContainerInset = UIEdgeInsetsMake(0, 0, 10, 0);
 
    if (self.textViewAttributedText)
    {
@@ -373,7 +373,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    void (^textViewAnimation)() = ^
    {
       CGRect containerFrameInTopMostSuperview = [topMostSuperview convertRect:self.textView.superview.frame toView:topMostSuperview];
-      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 15;
+      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 25;
       self.textView.frame = CGRectMake(0,
                                        containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + doneButtonVerticalPadding,
                                        containerViewSuperviewWidth,
