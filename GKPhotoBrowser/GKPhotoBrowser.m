@@ -21,6 +21,43 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    return attributedString;
 }
 
+static void _sizeLabelToRect(UILabel* label, CGRect labelRect)
+{
+   // Set the frame of the label to the targeted rectangle
+   label.frame = labelRect;
+
+   // Try all font sizes from largest to smallest font size
+   int fontSize = 300;
+   int minFontSize = 5;
+
+   // Fit label width wize
+   CGSize constraintSize = CGSizeMake(label.frame.size.width, MAXFLOAT);
+
+   do {
+      // Set current font size
+      label.font = [UIFont fontWithName:label.font.fontName size:fontSize];
+
+      // Find label size for current font size
+      CGRect textRect = [[label text] boundingRectWithSize:constraintSize
+                                                   options:NSStringDrawingUsesLineFragmentOrigin
+                                                attributes:@{NSFontAttributeName:label.font}
+                                                   context:nil];
+
+      CGSize labelSize = textRect.size;
+
+      // Done, if created label is within target size
+      CGFloat labelWidth = [label.text sizeWithAttributes:@{NSFontAttributeName : label.font}].width;
+      if (labelSize.height <= CGRectGetHeight(label.frame) && labelWidth <= CGRectGetWidth(label.frame))
+      {
+         break;
+      }
+      
+      // Decrease the font size and try again
+      fontSize -= 2;
+      
+   } while (fontSize > minFontSize);
+}
+
 @interface GKPhotoBrowser () <UIGestureRecognizerDelegate, UITextViewDelegate>
 
 @property (weak) IBOutlet UIImageView* imageView;
@@ -87,20 +124,21 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    self.headerLabel.textAlignment = NSTextAlignmentCenter;
    self.headerLabel.text = self.headerText;
 
-   [self sizeLabel:self.headerLabel toRect:self.headerLabel.frame];
+   _sizeLabelToRect(self.headerLabel, self.headerLabel.frame);
 }
 
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
    [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:18]];
-   self.textView.backgroundColor = [UIColor clearColor];
+   self.textView.backgroundColor = [UIColor colorWithWhite:0 alpha:.25];
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = YES;
    self.textView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
    self.textView.editable = NO;
    self.textView.linkTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1],
                                         NSUnderlineColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1]};
+   self.textView.textContainerInset = UIEdgeInsetsMake(10, 0, 10, 0);
 
    if (self.textViewAttributedText)
    {
@@ -196,7 +234,7 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    {
       _headerText = headerText;
       self.headerLabel.text = _headerText;
-      [self sizeLabel:self.headerLabel toRect:self.headerLabel.frame];
+      _sizeLabelToRect(self.headerLabel, self.headerLabel.frame);
    }
 }
 
@@ -209,6 +247,7 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
 - (void)dismissBrowser:(UIButton*)sender
 {
    self.state = GKPhotoBrowserStateDefault;
+   [self.textView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:NO];
 }
 
 - (void)toggleState
@@ -323,11 +362,11 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
    void (^textViewAnimation)() = ^
    {
       CGRect containerFrameInTopMostSuperview = [topMostSuperview convertRect:self.textView.superview.frame toView:topMostSuperview];
-      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 20;
+      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 15;
       self.textView.frame = CGRectMake(0,
                                        containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + doneButtonVerticalPadding,
                                        containerViewSuperviewWidth,
-                                       textViewHeight - doneButtonVerticalPadding - 10);
+                                       textViewHeight - doneButtonVerticalPadding);
    };
 
    void (^textViewAnimationCompletion)(BOOL finished) = ^(BOOL finished)
@@ -389,43 +428,6 @@ static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textS
       parentViewController.navigationController.navigationBarHidden = hidden;
       parentViewController = parentViewController.parentViewController;
    }
-}
-
-- (void)sizeLabel:(UILabel*)label toRect:(CGRect)labelRect
-{
-   // Set the frame of the label to the targeted rectangle
-   label.frame = labelRect;
-
-   // Try all font sizes from largest to smallest font size
-   int fontSize = 300;
-   int minFontSize = 5;
-
-   // Fit label width wize
-   CGSize constraintSize = CGSizeMake(label.frame.size.width, MAXFLOAT);
-
-   do {
-      // Set current font size
-      label.font = [UIFont fontWithName:label.font.fontName size:fontSize];
-
-      // Find label size for current font size
-      CGRect textRect = [[label text] boundingRectWithSize:constraintSize
-                                                   options:NSStringDrawingUsesLineFragmentOrigin
-                                                attributes:@{NSFontAttributeName:label.font}
-                                                   context:nil];
-
-      CGSize labelSize = textRect.size;
-
-      // Done, if created label is within target size
-      CGFloat labelWidth = [label.text sizeWithAttributes:@{NSFontAttributeName : label.font}].width;
-      if (labelSize.height <= CGRectGetHeight(label.frame) && labelWidth <= CGRectGetWidth(label.frame))
-      {
-         break;
-      }
-
-      // Decrease the font size and try again
-      fontSize -= 2;
-
-   } while (fontSize > minFontSize);
 }
 
 - (UIImage*)blurredSnapshot

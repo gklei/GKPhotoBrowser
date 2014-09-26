@@ -49,7 +49,7 @@
    [self.photoBrowser2 addBrowserToContainerView:self.photoBrowserContainer2 inParentController:self];
 
    self.photoBrowser2.image = [UIImage imageNamed:@"(7) Spacer Ring"];
-   self.photoBrowser2.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
+   self.photoBrowser2.text = @"Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling. Holes can form as a result of damage on the roll surface.  Abrasions, dings, & cuts can usually be removed by pulling film off the roll until the affected area has been removed.  The source of this type of damage is usually a result of transit damage, or rough handling.";
    self.photoBrowser2.usesTapRecognizerForDisplay = YES;
    self.photoBrowser2.respectsImageAspectRatio = YES;
    self.photoBrowser2.headerText = @"Low Cling";
