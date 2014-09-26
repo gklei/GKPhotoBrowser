@@ -373,7 +373,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    void (^textViewAnimation)() = ^
    {
       CGRect containerFrameInTopMostSuperview = [topMostSuperview convertRect:self.textView.superview.frame toView:topMostSuperview];
-      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 25;
+      CGFloat doneButtonVerticalPadding = CGRectGetHeight(self.doneButton.frame) + 20;
       self.textView.frame = CGRectMake(0,
                                        containerViewSuperviewHeight - textViewHeight - CGRectGetMinY(containerFrameInTopMostSuperview) + doneButtonVerticalPadding,
                                        containerViewSuperviewWidth,
