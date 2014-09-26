@@ -58,6 +58,17 @@ static void _sizeLabelToRect(UILabel* label, CGRect labelRect)
    } while (fontSize > minFontSize);
 }
 
+static UIImage* _blurredSnapshotOfView(UIView* view)
+{
+   UIGraphicsBeginImageContextWithOptions(CGSizeMake(CGRectGetWidth(view.frame), CGRectGetHeight(view.frame)), NO, 1.0f);
+   [view drawViewHierarchyInRect:CGRectMake(0, 0, CGRectGetWidth(view.frame), CGRectGetHeight(view.frame)) afterScreenUpdates:NO];
+   UIImage *snapshotImage = UIGraphicsGetImageFromCurrentImageContext();
+   UIImage *blurredSnapshotImage = [snapshotImage applyDarkEffect];
+   UIGraphicsEndImageContext();
+
+   return blurredSnapshotImage;
+}
+
 @interface GKPhotoBrowser () <UIGestureRecognizerDelegate, UITextViewDelegate>
 
 @property (weak) IBOutlet UIImageView* imageView;
@@ -131,7 +142,7 @@ static void _sizeLabelToRect(UILabel* label, CGRect labelRect)
 {
    self.textView = [[UITextView alloc] init];
    [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:18]];
-   self.textView.backgroundColor = [UIColor colorWithWhite:0 alpha:.25];
+   self.textView.backgroundColor = [UIColor clearColor];
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = YES;
    self.textView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
@@ -280,7 +291,7 @@ static void _sizeLabelToRect(UILabel* label, CGRect labelRect)
 {
    if (state == GKPhotoBrowserStateDisplay)
    {
-      self.dimLayer.contents = (id)[self blurredSnapshot].CGImage;
+      self.dimLayer.contents = (id)_blurredSnapshotOfView(self.topMostSuperview).CGImage;
       [self.topMostSuperview.layer addSublayer:self.dimLayer];
    }
    else
@@ -371,7 +382,10 @@ static void _sizeLabelToRect(UILabel* label, CGRect labelRect)
 
    void (^textViewAnimationCompletion)(BOOL finished) = ^(BOOL finished)
    {
-      [self.browserDelegate gkPhotoBrowserDidZoom:self];
+      if (state == GKPhotoBrowserStateDisplay)
+      {
+         [self.browserDelegate gkPhotoBrowserDidZoom:self];
+      }
    };
 
    void (^zoomAnimationCompletion)(BOOL) = ^(BOOL finished)
@@ -428,23 +442,6 @@ static void _sizeLabelToRect(UILabel* label, CGRect labelRect)
       parentViewController.navigationController.navigationBarHidden = hidden;
       parentViewController = parentViewController.parentViewController;
    }
-}
-
-- (UIImage*)blurredSnapshot
-{
-   UIView* topMostSuperview = self.topMostSuperview;
-   UIGraphicsBeginImageContextWithOptions(CGSizeMake(CGRectGetWidth(topMostSuperview.frame),
-                                                     CGRectGetHeight(topMostSuperview.frame)),
-                                          NO, 1.0f);
-   [topMostSuperview drawViewHierarchyInRect:CGRectMake(0, 0, CGRectGetWidth(topMostSuperview.frame), CGRectGetHeight(topMostSuperview.frame)) afterScreenUpdates:NO];
-   UIImage *snapshotImage = UIGraphicsGetImageFromCurrentImageContext();
-
-   // Now apply the blur effect using Apple's UIImageEffect category
-   UIImage *blurredSnapshotImage = [snapshotImage applyDarkEffect];
-
-   UIGraphicsEndImageContext();
-
-   return blurredSnapshotImage;
 }
 
 #pragma mark - Public
