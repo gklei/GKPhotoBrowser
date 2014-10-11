@@ -82,6 +82,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
 @property (nonatomic) UIView* containerZoomView;
 @property (nonatomic) UIScrollView* scrollZoomView;
+@property (nonatomic) UIScrollView* interactableScrollView;
 @property (nonatomic) UIImageView* scrollImageView;
 @property (nonatomic) UIViewController* parentController;
 
@@ -89,7 +90,8 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 @property (nonatomic) FlatPillButton* doneButton;
 @property (nonatomic, readonly) CGPoint containerViewCenterInSuperview;
 
-@property (nonatomic) CGPoint initialScrollViewOffset;
+@property (nonatomic) CGPoint initialScrollZoomViewOffset;
+@property (nonatomic) CGPoint initialInteractableScrollViewOffset;
 @property (nonatomic) UITapGestureRecognizer* tapRecognizer;
 
 @end
@@ -366,20 +368,14 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
          CGFloat initialYOffset = (CGRectGetHeight(imageViewFrame) - CGRectGetHeight(self.containerView.frame))*.5;
          [self.scrollZoomView addSubview:self.scrollImageView];
 
-         self.initialScrollViewOffset = CGPointMake(initialXOffset, initialYOffset);
-//         self.scrollZoomView.contentOffset = self.initialScrollViewOffset;
+         self.initialScrollZoomViewOffset = CGPointMake(initialXOffset, initialYOffset);
+         self.scrollZoomView.contentOffset = self.initialScrollZoomViewOffset;
          self.scrollZoomView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
          self.scrollZoomView.maximumZoomScale = 2.f;
-         self.scrollZoomView.backgroundColor = [UIColor colorWithRed:.25 green:.1 blue:.7 alpha:.5];
+         self.scrollZoomView.backgroundColor = [UIColor colorWithRed:.25 green:.1 blue:.2 alpha:.5];
 
          [topMostSuperview addSubview:self.scrollZoomView];
          self.containerView.hidden = YES;
-
-         CGSize contentSize = self.scrollImageView.frame.size;
-         contentSize.height *= .75f;
-         contentSize.width *= .75f;
-
-         self.scrollZoomView.contentSize = contentSize;
 
          containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
          yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
@@ -419,7 +415,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       {
          if (self.state == GKPhotoBrowserStateDefault)
          {
-            self.scrollZoomView.contentOffset = self.initialScrollViewOffset;
+            self.scrollZoomView.contentOffset = self.initialScrollZoomViewOffset;
          }
          self.scrollZoomView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
 
@@ -439,6 +435,10 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
       if (state == GKPhotoBrowserStateDefault)
       {
+         self.scrollZoomView.hidden = NO;
+         self.interactableScrollView.contentOffset = self.initialInteractableScrollViewOffset;
+         [self.interactableScrollView removeFromSuperview];
+         self.interactableScrollView = nil;
          [self.headerLabel removeFromSuperview];
       }
    };
@@ -457,6 +457,31 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    {
       if (state == GKPhotoBrowserStateDisplay)
       {
+         self.interactableScrollView = [[UIScrollView alloc] initWithFrame:self.scrollZoomView.frame];
+         self.interactableScrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+
+         CGFloat imageViewTargetHeight = self.imageView.image.size.height * (CGRectGetWidth(self.interactableScrollView.frame) / self.imageView.image.size.width);
+         CGFloat imageViewTargetWidth = self.imageView.image.size.width * (CGRectGetHeight(self.interactableScrollView.frame) / self.imageView.image.size.height);
+
+         CGRect imageViewFrame = CGRectMake(0, 0, CGRectGetWidth(self.interactableScrollView.frame), imageViewTargetHeight);
+         if (imageViewTargetWidth > CGRectGetWidth(self.interactableScrollView.frame))
+         {
+            imageViewFrame = CGRectMake(0, 0, imageViewTargetWidth, CGRectGetHeight(self.interactableScrollView.frame));
+         }
+         UIImageView* newImageView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+         newImageView.image = self.scrollImageView.image;
+         [self.interactableScrollView addSubview:newImageView];
+         self.interactableScrollView.contentSize = newImageView.frame.size;
+
+         CGFloat initialXOffset = (CGRectGetWidth(imageViewFrame) - CGRectGetWidth(self.interactableScrollView.frame))*.5;
+         CGFloat initialYOffset = (CGRectGetHeight(imageViewFrame) - CGRectGetHeight(self.interactableScrollView.frame))*.5;
+
+         self.initialInteractableScrollViewOffset = CGPointMake(initialXOffset, initialYOffset);
+         self.interactableScrollView.contentOffset = self.initialInteractableScrollViewOffset;
+
+         [topMostSuperview addSubview:self.interactableScrollView];
+         self.scrollZoomView.hidden = YES;
+
          [self.browserDelegate gkPhotoBrowserDidZoom:self];
       }
    };
