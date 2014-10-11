@@ -81,12 +81,15 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 @property (nonatomic) NSAttributedString* textViewAttributedText;
 
 @property (nonatomic) UIView* containerZoomView;
+@property (nonatomic) UIScrollView* scrollZoomView;
+@property (nonatomic) UIImageView* scrollImageView;
 @property (nonatomic) UIViewController* parentController;
 
 @property (nonatomic) CALayer* dimLayer;
 @property (nonatomic) FlatPillButton* doneButton;
 @property (nonatomic, readonly) CGPoint containerViewCenterInSuperview;
 
+@property (nonatomic) CGPoint initialScrollViewOffset;
 @property (nonatomic) UITapGestureRecognizer* tapRecognizer;
 
 @end
@@ -100,6 +103,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       self.state = GKPhotoBrowserStateDefault;
       self.hidesParentNavigationBarsOnZoom = YES;
       self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(zoom:)];
+      self.maximumTargetHeightScreenPercentage = .55f;
    }
    return self;
 }
@@ -116,6 +120,8 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    [super viewDidLoad];
    self.view.translatesAutoresizingMaskIntoConstraints = NO;
 
+   self.imageView.contentMode = UIViewContentModeScaleAspectFill;
+   self.imageView.layer.masksToBounds = YES;
    [self setupTextView];
    [self setupDimLayer];
 }
@@ -302,7 +308,8 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
 - (void)toggleResizeWithState:(GKPhotoBrowserState)state
 {
-   [[UIApplication sharedApplication] setStatusBarStyle: (state != GKPhotoBrowserStateDisplay) ? UIStatusBarStyleDefault : UIStatusBarStyleLightContent];
+   UIStatusBarStyle statusBarStyle = (state != GKPhotoBrowserStateDisplay) ? UIStatusBarStyleDefault : UIStatusBarStyleLightContent;
+   [[UIApplication sharedApplication] setStatusBarStyle:statusBarStyle];
 
    UIView* topMostSuperview = self.topMostSuperview;
    if (self.textView.superview == nil)
@@ -314,13 +321,6 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    [self updateDimLayerWithState:state];
    [self updateDoneButtonWithState:state];
 
-   if (self.containerZoomView.superview == nil)
-   {
-      self.containerZoomView.frame = [self.containerView.superview convertRect:self.containerView.frame toView:topMostSuperview];
-      [topMostSuperview addSubview:self.containerZoomView];
-      self.containerView.hidden = YES;
-   }
-
    CGFloat containerViewSuperviewHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
    CGFloat containerViewSuperviewWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
 
@@ -329,6 +329,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
    CGFloat containerViewTargetHeight;
    CGFloat yScale = xScale;
+
    if (self.respectsImageAspectRatio && self.imageView.image)
    {
       containerViewTargetHeight = self.imageView.image.size.height * (containerViewSuperviewWidth / self.imageView.image.size.width);
@@ -336,13 +337,65 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    }
    else
    {
-      containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
-   }
-   if (self.textView.text.length > 0)
-   {
-      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
+//      containerViewTargetHeight = CGRectGetHeight(self.containerView.frame) * xScale;
+      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*self.maximumTargetHeightScreenPercentage;
       yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
    }
+
+   if (self.state == GKPhotoBrowserStateDisplay)
+   {
+      if (containerViewTargetHeight > containerViewSuperviewHeight*self.maximumTargetHeightScreenPercentage)
+      {
+         self.scrollZoomView.frame = [self.containerView.superview convertRect:self.containerView.frame toView:topMostSuperview];
+
+         CGFloat imageViewTargetHeight = self.imageView.image.size.height * (CGRectGetWidth(self.containerView.frame) / self.imageView.image.size.width);
+         CGFloat imageViewTargetWidth = self.imageView.image.size.width * (CGRectGetHeight(self.containerView.frame) / self.imageView.image.size.height);
+
+
+         CGRect imageViewFrame = CGRectMake(0, 0, CGRectGetWidth(self.containerView.frame), imageViewTargetHeight);
+         if (imageViewTargetWidth > CGRectGetWidth(self.containerView.frame))
+         {
+            imageViewFrame = CGRectMake(0, 0, imageViewTargetWidth, CGRectGetHeight(self.containerView.frame));
+         }
+
+         [self.scrollImageView removeFromSuperview];
+         self.scrollImageView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+         self.scrollImageView.image = self.imageView.image;
+
+         CGFloat initialXOffset = (CGRectGetWidth(imageViewFrame) - CGRectGetWidth(self.containerView.frame))*.5;
+         CGFloat initialYOffset = (CGRectGetHeight(imageViewFrame) - CGRectGetHeight(self.containerView.frame))*.5;
+         [self.scrollZoomView addSubview:self.scrollImageView];
+
+         self.initialScrollViewOffset = CGPointMake(initialXOffset, initialYOffset);
+//         self.scrollZoomView.contentOffset = self.initialScrollViewOffset;
+         self.scrollZoomView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+         self.scrollZoomView.maximumZoomScale = 2.f;
+         self.scrollZoomView.backgroundColor = [UIColor colorWithRed:.25 green:.1 blue:.7 alpha:.5];
+
+         [topMostSuperview addSubview:self.scrollZoomView];
+         self.containerView.hidden = YES;
+
+         CGSize contentSize = self.scrollImageView.frame.size;
+         contentSize.height *= .75f;
+         contentSize.width *= .75f;
+
+         self.scrollZoomView.contentSize = contentSize;
+
+         containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
+         yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
+      }
+      else
+      {
+         self.containerZoomView.frame = [self.containerView.superview convertRect:self.containerView.frame toView:topMostSuperview];
+         [topMostSuperview addSubview:self.containerZoomView];
+         self.containerView.hidden = YES;
+      }
+   }
+//   if (self.textView.text.length > 0)
+//   {
+//      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds)*.55f;
+//      yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
+//   }
 //   else
 //   {
 //      containerViewTargetHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.headerLabel.frame) - 20;
@@ -362,7 +415,27 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
    void (^zoomAnimation)() = ^
    {
-      self.containerZoomView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
+      if (self.scrollZoomView.superview != nil)
+      {
+         if (self.state == GKPhotoBrowserStateDefault)
+         {
+            self.scrollZoomView.contentOffset = self.initialScrollViewOffset;
+         }
+         self.scrollZoomView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
+
+         CGFloat imageViewXScale = 1/xScale;
+         imageViewXScale *= containerViewSuperviewWidth / CGRectGetWidth(self.scrollImageView.frame);
+
+         CGFloat imageViewYScale = 1/yScale;
+         imageViewYScale *= containerViewSuperviewWidth / CGRectGetWidth(self.scrollImageView.frame);
+
+         self.scrollImageView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(self.scrollImageView.layer.transform, imageViewXScale, imageViewYScale, 1) : CATransform3DIdentity;
+      }
+      else
+      {
+         self.containerZoomView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
+      }
+
       self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
       if (state == GKPhotoBrowserStateDefault)
       {
@@ -393,6 +466,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       if (state == GKPhotoBrowserStateDefault)
       {
          self.containerView.hidden = NO;
+         [self.scrollZoomView removeFromSuperview];
          [self.containerZoomView removeFromSuperview];
          [self.browserDelegate gkPhotoBrowserDidDismiss:self];
       }
@@ -460,6 +534,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    [self setupHeaderLabel];
 
    self.containerZoomView = [[UIView alloc] initWithFrame:self.containerView.frame];
+   self.scrollZoomView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
 }
 
 - (void)makeCaptionSubstring:(NSString *)substring hyperlinkToDisplayImage:(UIImage *)image

@@ -30,6 +30,11 @@ typedef NS_ENUM(NSUInteger, GKPhotoBrowserState)
 @property (nonatomic) NSString* text;
 
 @property (nonatomic) BOOL usesTapRecognizerForDisplay;
+
+// Defaults to .55
+@property (nonatomic) CGFloat maximumTargetHeightScreenPercentage;
+
+// Defaults to YES
 @property (nonatomic) BOOL respectsImageAspectRatio;
 
 // Defaults to YES
