@@ -86,6 +86,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 @property (nonatomic) UIImageView* scrollImageView;
 @property (nonatomic) UIViewController* parentController;
 
+@property (nonatomic) CALayer* topDimLayer;
 @property (nonatomic) CALayer* dimLayer;
 @property (nonatomic) CALayer* scrollDimLayer;
 @property (nonatomic) FlatPillButton* doneButton;
@@ -143,6 +144,10 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    self.headerLabel.textColor = [UIColor whiteColor];
    self.headerLabel.textAlignment = NSTextAlignmentCenter;
    self.headerLabel.text = self.headerText;
+
+   self.topDimLayer = [CALayer layer];
+   self.topDimLayer.frame = CGRectMake(0, 0, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetMaxY(self.doneButton.frame) + 15);
+   self.topDimLayer.backgroundColor = [UIColor colorWithWhite:0 alpha:.25].CGColor;
 
    _sizeLabelToRect(self.headerLabel, self.headerLabel.frame);
 }
@@ -302,6 +307,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    {
       self.dimLayer.contents = (id)_blurredSnapshotOfView(self.topMostSuperview).CGImage;
       [self.topMostSuperview.layer addSublayer:self.dimLayer];
+      [self.topMostSuperview.layer addSublayer:self.topDimLayer];
    }
    else
    {
@@ -369,7 +375,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       yScale = containerViewTargetHeight / CGRectGetHeight(self.containerView.frame);
    }
 
-   CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight;
+   CGFloat textViewHeight = containerViewSuperviewHeight - containerViewTargetHeight - statusBarHeight - 5;
 
    self.textView.frame = CGRectMake(0, containerViewSuperviewHeight, containerViewSuperviewWidth, textViewHeight);
    self.textView.layer.zPosition = 100;
@@ -377,7 +383,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
    CGPoint screenCenter = CGPointMake(CGRectGetMidX([UIScreen mainScreen].bounds), CGRectGetMidY([UIScreen mainScreen].bounds));
    CGFloat verticalOffset = (containerViewSuperviewHeight - containerViewTargetHeight)*.5;
-   CGFloat verticalShift = self.containerViewCenterInSuperview.y - screenCenter.y + verticalOffset - statusBarHeight - CGRectGetHeight(self.doneButton.frame) - 15;
+   CGFloat verticalShift = self.containerViewCenterInSuperview.y - screenCenter.y + verticalOffset - statusBarHeight - CGRectGetHeight(self.doneButton.frame) - 20;
    CGFloat horizontalShift = self.containerViewCenterInSuperview.x - screenCenter.x;
 
    CATransform3D transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DMakeTranslation(-horizontalShift, -verticalShift, 0) : CATransform3DIdentity;
@@ -415,6 +421,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
          [self.interactableScrollView removeFromSuperview];
          self.interactableScrollView = nil;
          [self.headerLabel removeFromSuperview];
+         [self.topDimLayer removeFromSuperlayer];
       }
    };
 
@@ -435,6 +442,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
          self.interactableScrollView = [[UIScrollView alloc] initWithFrame:self.scrollZoomView.frame];
          self.interactableScrollView.delegate = self;
          self.interactableScrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
+         self.interactableScrollView.backgroundColor = [UIColor colorWithWhite:0 alpha:.25];
 
          CGFloat imageViewTargetHeight = self.imageView.image.size.height * (CGRectGetWidth(self.interactableScrollView.frame) / self.imageView.image.size.width);
          CGFloat imageViewTargetWidth = self.imageView.image.size.width * (CGRectGetHeight(self.interactableScrollView.frame) / self.imageView.image.size.height);
