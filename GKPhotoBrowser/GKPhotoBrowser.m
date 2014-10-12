@@ -69,7 +69,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    return blurredSnapshotImage;
 }
 
-@interface GKPhotoBrowser () <UIGestureRecognizerDelegate, UITextViewDelegate>
+@interface GKPhotoBrowser () <UIGestureRecognizerDelegate, UITextViewDelegate, UIScrollViewDelegate>
 
 @property (weak) IBOutlet UIImageView* imageView;
 @property (nonatomic) UIImage* alternateTextViewImage;
@@ -87,6 +87,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 @property (nonatomic) UIViewController* parentController;
 
 @property (nonatomic) CALayer* dimLayer;
+@property (nonatomic) CALayer* scrollDimLayer;
 @property (nonatomic) FlatPillButton* doneButton;
 @property (nonatomic, readonly) CGPoint containerViewCenterInSuperview;
 
@@ -184,7 +185,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
                                       60.0,
                                       30.0);
 
-   UIFont* font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+   UIFont* font = [UIFont fontWithName:@"HelveticaNeue-CondensedBold" size:16];
    NSAttributedString* attrString = [[NSAttributedString alloc] initWithString:@"Done" attributes:@{NSFontAttributeName : font,
                                                                                                     NSForegroundColorAttributeName : [UIColor whiteColor]}];
    [self.doneButton setAttributedTitle:attrString forState:UIControlStateNormal];
@@ -387,6 +388,8 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       {
          if (self.state == GKPhotoBrowserStateDefault)
          {
+            [self.scrollDimLayer removeFromSuperlayer];
+            self.scrollDimLayer = nil;
             self.scrollZoomView.contentOffset = self.initialScrollZoomViewOffset;
          }
          self.scrollZoomView.layer.transform = (state == GKPhotoBrowserStateDisplay) ? CATransform3DScale(transform, xScale, yScale, 1) : CATransform3DIdentity;
@@ -430,6 +433,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       if (state == GKPhotoBrowserStateDisplay)
       {
          self.interactableScrollView = [[UIScrollView alloc] initWithFrame:self.scrollZoomView.frame];
+         self.interactableScrollView.delegate = self;
          self.interactableScrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
 
          CGFloat imageViewTargetHeight = self.imageView.image.size.height * (CGRectGetWidth(self.interactableScrollView.frame) / self.imageView.image.size.width);
@@ -456,6 +460,27 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
             [topMostSuperview addSubview:self.interactableScrollView];
             self.scrollZoomView.hidden = YES;
          }
+
+         self.scrollDimLayer = [CALayer layer];
+         self.scrollDimLayer.frame = self.interactableScrollView.bounds;
+         self.scrollDimLayer.backgroundColor = [UIColor colorWithWhite:0 alpha:.75].CGColor;
+
+         CATextLayer* scrollLabel = [CATextLayer layer];
+         scrollLabel.alignmentMode = kCAAlignmentCenter;
+         scrollLabel.string = @"Scroll to view entire image";
+
+         NSString* fontName = @"HelveticaNeue-CondensedBold";
+         scrollLabel.font = CGFontCreateWithFontName((__bridge CFStringRef)fontName);
+         scrollLabel.fontSize = 18;
+         scrollLabel.foregroundColor = [UIColor whiteColor].CGColor;
+         scrollLabel.frame = CGRectMake(0, 0, CGRectGetWidth(self.scrollDimLayer.frame), 40);
+         scrollLabel.string = @"Scroll to view entire image";
+
+         scrollLabel.contentsScale = [UIScreen mainScreen].scale;
+
+         scrollLabel.position = CGPointMake(CGRectGetMidX(self.scrollDimLayer.bounds), CGRectGetMidY(self.scrollDimLayer.bounds));
+         [self.scrollDimLayer addSublayer:scrollLabel];
+         [self.interactableScrollView.layer addSublayer:self.scrollDimLayer];
 
          [self.browserDelegate gkPhotoBrowserDidZoom:self];
       }
@@ -566,6 +591,16 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 {
    self.containerZoomView.layer.contents = (__bridge id)self.alternateTextViewImage.CGImage;
    return NO;
+}
+
+#pragma mark - UIScrollView Delegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+   if (self.scrollDimLayer)
+   {
+      [self.scrollDimLayer removeFromSuperlayer];
+      self.scrollDimLayer = nil;
+   }
 }
 
 @end
