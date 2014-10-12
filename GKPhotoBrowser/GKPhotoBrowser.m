@@ -416,6 +416,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       self.textView.hidden = (state != GKPhotoBrowserStateDisplay);
       if (state == GKPhotoBrowserStateDefault)
       {
+         self.scrollZoomView.layer.masksToBounds = YES;
          self.scrollZoomView.hidden = NO;
          self.interactableScrollView.contentOffset = self.initialInteractableScrollViewOffset;
          [self.interactableScrollView removeFromSuperview];
@@ -439,6 +440,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    {
       if (state == GKPhotoBrowserStateDisplay)
       {
+         self.scrollZoomView.layer.masksToBounds = NO;
          self.interactableScrollView = [[UIScrollView alloc] initWithFrame:self.scrollZoomView.frame];
          self.interactableScrollView.delegate = self;
          self.interactableScrollView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
@@ -568,6 +570,8 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
    self.containerZoomView = [[UIView alloc] initWithFrame:self.containerView.frame];
    self.scrollZoomView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+   self.scrollZoomView.layer.cornerRadius = 4.f;
+//   self.scrollZoomView.layer.masksToBounds = YES;
 }
 
 - (void)makeCaptionSubstring:(NSString *)substring hyperlinkToDisplayImage:(UIImage *)image
