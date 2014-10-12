@@ -473,7 +473,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
          self.scrollDimLayer = [CALayer layer];
          self.scrollDimLayer.frame = self.interactableScrollView.bounds;
-         self.scrollDimLayer.backgroundColor = [UIColor colorWithWhite:0 alpha:.75].CGColor;
+         self.scrollDimLayer.backgroundColor = [UIColor colorWithWhite:0 alpha:.6].CGColor;
 
          CATextLayer* scrollLabel = [CATextLayer layer];
          scrollLabel.alignmentMode = kCAAlignmentCenter;
@@ -493,6 +493,15 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
          [self.interactableScrollView.layer addSublayer:self.scrollDimLayer];
 
          [self.browserDelegate gkPhotoBrowserDidZoom:self];
+
+         CABasicAnimation* fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+         fadeOutAnimation.toValue = @(0);
+         fadeOutAnimation.beginTime = CACurrentMediaTime() + .75;
+         fadeOutAnimation.duration = .5;
+         fadeOutAnimation.removedOnCompletion = NO;
+         fadeOutAnimation.fillMode = kCAFillModeForwards;
+
+         [self.scrollDimLayer addAnimation:fadeOutAnimation forKey:@"fadeOut"];
       }
    };
 
