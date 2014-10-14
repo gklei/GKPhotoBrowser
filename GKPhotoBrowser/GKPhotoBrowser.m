@@ -496,8 +496,8 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
          CABasicAnimation* fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
          fadeOutAnimation.toValue = @(0);
-         fadeOutAnimation.beginTime = CACurrentMediaTime() + .75;
-         fadeOutAnimation.duration = .5;
+         fadeOutAnimation.beginTime = CACurrentMediaTime() + 2.25;
+         fadeOutAnimation.duration = .75;
          fadeOutAnimation.removedOnCompletion = NO;
          fadeOutAnimation.fillMode = kCAFillModeForwards;
 
