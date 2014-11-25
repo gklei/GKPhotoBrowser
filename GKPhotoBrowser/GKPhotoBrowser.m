@@ -10,6 +10,8 @@
 #import "FlatPillButton.h"
 #import "UIImage+ImageEffects.h"
 
+#define IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+
 static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textSize)
 {
    NSURL* url = [NSURL URLWithString:@"GKPhotoBrowserImage"];
