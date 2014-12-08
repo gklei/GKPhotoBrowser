@@ -10,6 +10,8 @@
 #import "FlatPillButton.h"
 #import "UIImage+ImageEffects.h"
 
+#define IS_IPAD (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+
 static NSAttributedString* _attributedLinkForImage(NSString* text, CGFloat textSize)
 {
    NSURL* url = [NSURL URLWithString:@"GKPhotoBrowserImage"];
@@ -107,7 +109,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       self.state = GKPhotoBrowserStateDefault;
       self.hidesParentNavigationBarsOnZoom = YES;
       self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(zoom:)];
-      self.maximumTargetHeightScreenPercentage = .55f;
+      self.maximumTargetHeightScreenPercentage = IS_IPAD ? .6 : .55f;
    }
    return self;
 }
@@ -155,7 +157,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 - (void)setupTextView
 {
    self.textView = [[UITextView alloc] init];
-   [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:18]];
+   [self.textView setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:IS_IPAD ? 28 : 18]];
    self.textView.backgroundColor = [UIColor clearColor];
    self.textView.textColor = [UIColor whiteColor];
    self.textView.showsVerticalScrollIndicator = YES;
@@ -163,7 +165,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    self.textView.editable = NO;
    self.textView.linkTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1],
                                         NSUnderlineColorAttributeName : [UIColor colorWithRed:0 green:1 blue:1 alpha:1]};
-   self.textView.textContainerInset = UIEdgeInsetsMake(0, 0, 10, 0);
+   self.textView.textContainerInset = UIEdgeInsetsMake(0, 5, 10, 5);
 
    if (self.textViewAttributedText)
    {
@@ -183,14 +185,15 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
    self.doneButton = [FlatPillButton button];
    [self.doneButton addTarget:self action:@selector(dismissBrowser:) forControlEvents:UIControlEventTouchUpInside];
 
-   CGSize doneButtonSize = {60, 30};
    CGFloat padding = 5;
+   CGSize doneButtonSize = IS_IPAD ? CGSizeMake(110, 50) : CGSizeMake(60, 30);
+
    self.doneButton.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - doneButtonSize.width - padding,
                                       CGRectGetHeight([UIApplication sharedApplication].statusBarFrame) + padding,
-                                      60.0,
-                                      30.0);
+                                      doneButtonSize.width,
+                                      doneButtonSize.height);
 
-   UIFont* font = [UIFont fontWithName:@"HelveticaNeue-CondensedBold" size:16];
+   UIFont* font = [UIFont fontWithName:@"HelveticaNeue-CondensedBold" size:IS_IPAD ? 28 : 16];
    NSAttributedString* attrString = [[NSAttributedString alloc] initWithString:@"Done" attributes:@{NSFontAttributeName : font,
                                                                                                     NSForegroundColorAttributeName : [UIColor whiteColor]}];
    [self.doneButton setAttributedTitle:attrString forState:UIControlStateNormal];
@@ -481,7 +484,7 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
 
          NSString* fontName = @"HelveticaNeue-CondensedBold";
          scrollLabel.font = CGFontCreateWithFontName((__bridge CFStringRef)fontName);
-         scrollLabel.fontSize = 18;
+         scrollLabel.fontSize = IS_IPAD ? 28 : 18;
          scrollLabel.foregroundColor = [UIColor whiteColor].CGColor;
          scrollLabel.frame = CGRectMake(0, 0, CGRectGetWidth(self.scrollDimLayer.frame), 40);
          scrollLabel.string = @"Scroll to view entire image";
@@ -593,12 +596,13 @@ static UIImage* _blurredSnapshotOfView(UIView* view)
       NSString* firstSubstring = [self.textView.text substringWithRange:NSMakeRange(0, range.location)];
       NSString* secondSubstring = [self.textView.text substringFromIndex:(range.location + range.length)];
 
-      UIFont* font = [UIFont fontWithName:@"HelveticaNeue-Light" size:18];
+      CGFloat fontSize = IS_IPAD ? 28 : 18;
+      UIFont* font = [UIFont fontWithName:@"HelveticaNeue-Light" size:fontSize];
       NSDictionary* attributes = @{NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor]};
 
       NSMutableAttributedString *attributedText = [NSMutableAttributedString new];
       [attributedText appendAttributedString:[[NSAttributedString alloc] initWithString:firstSubstring attributes:attributes]];
-      [attributedText appendAttributedString:_attributedLinkForImage(substring, 18)];
+      [attributedText appendAttributedString:_attributedLinkForImage(substring, fontSize)];
       [attributedText appendAttributedString:[[NSAttributedString alloc] initWithString:secondSubstring attributes:attributes]];
 
       self.textViewAttributedText = attributedText;
